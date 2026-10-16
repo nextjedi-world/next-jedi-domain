@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    uses: nextjedi/platform/.github/workflows/ci-web.yml@main
+    with:
+      working-directory: .
+      node-version: '22'
+    secrets: inherit
