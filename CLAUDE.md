@@ -50,7 +50,7 @@ what CI and the Stop hook run. Do not finish a task while it fails. Node 22 (`.n
 
 ## CI
 
-`.github/workflows/ci.yml` calls `nextjedi/platform/.github/workflows/ci-web.yml@main`;
-`commitlint.yml` checks the PR title. `claude-review.yml` and `claude-mention.yml` skip until the
-repo variable `CLAUDE_REVIEW_ENABLED` is `true` and `CLAUDE_CODE_OAUTH_TOKEN` is set. Renovate keeps
-dependencies current; release-please cuts releases.
+`.github/workflows/ci.yml` runs `make verify` on Node 22; `commitlint.yml` checks the PR title and the
+`Fixes NEX-123` line. Both are self-contained because this repo is public and `nextjedi/platform` is
+private, so its reusable workflows (`ci-web.yml`, `claude-review.yml`) cannot be called from here.
+Keep ci.yml in line with `ci-web.yml`. Renovate keeps dependencies current; release-please cuts releases.
