@@ -1,4 +1,4 @@
-// Same rules as nextjedi/platform commitlint.config.mjs. Used by the lefthook commit-msg hook.
+// Same rules as nextjedi-world/platform commitlint.config.mjs. Used by the lefthook commit-msg hook.
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
