@@ -42,3 +42,14 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 .vercel
+
+# Local env files (names live in .env.example)
+.env
+.env.local
+.env.*.local
+
+# Claude Code: settings.json is shared, settings.local.json is per machine
+.claude/settings.local.json
+
+# Local browser-automation output
+.playwright-mcp/

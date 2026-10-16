@@ -1,0 +1,10 @@
+// Same rules as nextjedi/platform commitlint.config.mjs. Used by the lefthook commit-msg hook.
+export default {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'header-max-length': [2, 'always', 100],
+    'subject-case': [0],
+    'body-max-line-length': [0],
+    'footer-max-line-length': [0],
+  },
+};

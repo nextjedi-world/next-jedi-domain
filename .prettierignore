@@ -1,0 +1,23 @@
+node_modules
+dist
+.angular
+coverage
+package-lock.json
+.playwright-mcp
+infra
+public
+docs/baseline
+CHANGELOG.md
+.release-please-manifest.json
+
+# BASELINE: existing sources were never formatted with Prettier. Reformatting them is a
+# separate, behaviour-free follow-up; until then only new code is checked.
+src/**
+!src/app/
+!src/app/observability/
+!src/app/observability/**
+!src/app/*.spec.ts
+src/app/app.routes.ts
+tsconfig.app.json
+tsconfig.spec.json
+!src/main.ts
