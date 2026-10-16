@@ -3,7 +3,7 @@
 Product id: `next-jedi-domain` (`NEXTJEDI_PRODUCT`). The nextjedi.com portfolio site: Angular 21 SPA
 (standalone components, no NgModules, plain CSS) on Vercel. Repo `nextjedi/next-jedi-domain`,
 default branch **`master`**. **Pushing to `master` deploys to production.** Built on the NextJedi
-Studio Platform (`nextjedi/platform`).
+Studio Platform (`nextjedi-world/platform`).
 
 ## Commands
 
@@ -51,6 +51,6 @@ what CI and the Stop hook run. Do not finish a task while it fails. Node 22 (`.n
 ## CI
 
 `.github/workflows/ci.yml` runs `make verify` on Node 22; `commitlint.yml` checks the PR title and the
-`Fixes NEX-123` line. Both are self-contained because this repo is public and `nextjedi/platform` is
+`Fixes NEX-123` line. Both are self-contained because this repo is public and `nextjedi-world/platform` is
 private, so its reusable workflows (`ci-web.yml`, `claude-review.yml`) cannot be called from here.
 Keep ci.yml in line with `ci-web.yml`. Renovate keeps dependencies current; release-please cuts releases.
