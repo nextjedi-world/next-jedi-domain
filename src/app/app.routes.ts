@@ -25,6 +25,11 @@ export const routes: Routes = [
   { path: 'aurora', component: AuroraPage },
   { path: 'team', component: TeamPage },
 
+  // Company privacy policy (NEX-1810): website + internal social publishing tool.
+  // Linked from LinkedIn, Google (YouTube API) and Meta app settings. Apps keep their own policies.
+  { path: 'privacy', component: SharedLegal, data: { legalDoc: 'privacy' } },
+  { path: 'privacy-policy', redirectTo: 'privacy', pathMatch: 'full' },
+
   // Business-level legal pages (required for Razorpay KYC — present on every domain)
   { path: 'terms', component: SharedLegal, data: { legalDoc: 'terms' } },
   { path: 'refund', component: SharedLegal, data: { legalDoc: 'refund' } },
