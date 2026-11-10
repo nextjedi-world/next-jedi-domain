@@ -1,0 +1,93 @@
+<div class="ideas-page">
+  <app-site-header pageName="Ideas" />
+
+  <main>
+    <section class="ideas-hero">
+      <div class="ideas-inner">
+        <span class="eyebrow">Ideas · Founder spots</span>
+        <h1 class="ideas-title">What we're <em>building next.</em></h1>
+        <p class="ideas-sub">
+          Every Next Jedi app, from live on the stores to a sketch on a whiteboard. Reserve a
+          founder spot on the ones you want, and you'll hear first when they're ready.
+        </p>
+      </div>
+    </section>
+
+    <section class="ideas-list" aria-live="polite">
+      <div class="ideas-inner">
+        @switch (state()) {
+          @case ('loading') {
+            <div class="idea-grid" aria-busy="true" aria-label="Loading ideas">
+              @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+                <div class="idea-card skeleton">
+                  <div class="sk sk-icon"></div>
+                  <div class="sk sk-line w60"></div>
+                  <div class="sk sk-line w90"></div>
+                  <div class="sk sk-line w40"></div>
+                </div>
+              }
+            </div>
+          }
+          @case ('error') {
+            <div class="state-box" role="alert">
+              <span class="material-symbols-outlined state-icon">cloud_off</span>
+              <h2 class="state-title">We couldn't load the ideas</h2>
+              <p class="state-sub">This is on our side. Please try again in a moment.</p>
+              <button type="button" class="btn-primary" (click)="load()">Try again</button>
+            </div>
+          }
+          @default {
+            @if (products().length === 0) {
+              <div class="state-box">
+                <span class="material-symbols-outlined state-icon">lightbulb</span>
+                <h2 class="state-title">No ideas to show yet</h2>
+                <p class="state-sub">
+                  We're between ideas. Tell us what you'd like us to build instead.
+                </p>
+                <a class="btn-primary" routerLink="/aurora">Suggest an idea</a>
+              </div>
+            } @else {
+              <div class="idea-grid">
+                @for (p of products(); track p.id) {
+                  <a class="idea-card" [routerLink]="['/ideas', p.id]">
+                    <div class="card-top">
+                      @if (p.imageUrl) {
+                        <img class="card-img" [src]="p.imageUrl" alt="" />
+                      } @else {
+                        <span class="card-letter" aria-hidden="true">{{ p.name.charAt(0) }}</span>
+                      }
+                      <app-status-badge [status]="p.status" />
+                    </div>
+                    <h2 class="card-name">{{ p.name }}</h2>
+                    <p class="card-tagline">{{ p.tagline }}</p>
+                    <p class="card-summary">{{ p.summary }}</p>
+                    @if (p.platforms.length) {
+                      <ul class="chips" aria-label="Platforms">
+                        @for (pl of p.platforms; track pl) {
+                          <li class="chip">{{ platformLabels[pl] || pl }}</li>
+                        }
+                      </ul>
+                    }
+                    @if (p.offer) {
+                      <app-offer-progress class="card-progress" [offer]="p.offer" />
+                    }
+                    <span class="card-cta">
+                      {{
+                        p.offer && p.offer.claimed < p.offer.cap
+                          ? 'Reserve a founder spot'
+                          : 'See the idea'
+                      }}
+                      <span class="material-symbols-outlined">arrow_forward</span>
+                    </span>
+                  </a>
+                }
+              </div>
+            }
+          }
+        }
+      </div>
+    </section>
+  </main>
+
+  <app-footer />
+</div>

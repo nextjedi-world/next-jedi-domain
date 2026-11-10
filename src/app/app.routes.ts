@@ -10,6 +10,7 @@ import { AuroraPage } from './aurora/aurora';
 import { TeamPage } from './team/team';
 import { MindfulTennisPage } from './mindful-tennis/mindful-tennis';
 import { APPS } from './apps.config';
+import { authGuard } from './core/auth/auth.guard';
 
 function appRoutes(slug: string): Routes {
   return [
@@ -24,6 +25,24 @@ export const routes: Routes = [
   { path: '', component: Home },
   { path: 'aurora', component: AuroraPage },
   { path: 'team', component: TeamPage },
+
+  // Ideas and founder spots (NJACC-62), sign-in and account (NJACC-63). Data from platform-api.
+  // Lazy, so the home page does not pay for them.
+  { path: 'ideas', loadComponent: () => import('./ideas/ideas').then((m) => m.IdeasPage) },
+  {
+    path: 'ideas/:slug',
+    loadComponent: () => import('./ideas/idea-detail').then((m) => m.IdeaDetailPage),
+  },
+  { path: 'sign-in', loadComponent: () => import('./auth/sign-in').then((m) => m.SignInPage) },
+  {
+    path: 'auth/callback',
+    loadComponent: () => import('./auth/auth-callback').then((m) => m.AuthCallbackPage),
+  },
+  {
+    path: 'account',
+    canActivate: [authGuard],
+    loadComponent: () => import('./account/account').then((m) => m.AccountPage),
+  },
 
   // Company privacy policy (NEX-1810): website + internal social publishing tool.
   // Linked from LinkedIn, Google (YouTube API) and Meta app settings. Apps keep their own policies.

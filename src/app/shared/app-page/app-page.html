@@ -14,9 +14,11 @@
         <span class="nav-app-name">{{ app.name }}</span>
       </div>
       <nav class="nav-global-links">
+        <a class="nav-global-link" routerLink="/ideas">Ideas</a>
         <a class="nav-global-link" routerLink="/aurora">Project Aurora</a>
         <a class="nav-global-link" routerLink="/team">Meet the Team</a>
       </nav>
+      <app-user-menu />
     </div>
   </header>
 
@@ -83,6 +85,10 @@
           }
 
         </div>
+        <a class="idea-card-link" [routerLink]="'/ideas/' + app.slug">
+          <span class="material-symbols-outlined">workspace_premium</span>
+          Founder spots and roadmap: see the {{ app.name }} idea card
+        </a>
       </div>
       <div class="hero-visual">
         @if (app.screenshots && app.screenshots.length > 0) {
@@ -203,6 +209,7 @@
       [stage]="app.android.stage"
       [storeUrl]="app.android.storeUrl ?? ''"
       [appName]="app.name"
+      [appSlug]="app.slug"
       [appIcon]="app.icon"
       (closed)="showAndroidPanel = false"
     />
@@ -213,6 +220,7 @@
       [stage]="app.ios.stage"
       [storeUrl]="app.ios.storeUrl ?? ''"
       [appName]="app.name"
+      [appSlug]="app.slug"
       [appIcon]="app.icon"
       (closed)="showIosPanel = false"
     />

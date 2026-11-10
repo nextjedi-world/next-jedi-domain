@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { UserMenuComponent } from '../user-menu/user-menu';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { APPS, AppConfig } from '../../apps.config';
 import { FooterComponent } from '../footer/footer';
@@ -7,7 +8,7 @@ import { SeoService } from '../../seo.service';
 
 @Component({
   selector: 'app-shared-marketing',
-  imports: [RouterLink, FooterComponent],
+  imports: [RouterLink, FooterComponent, UserMenuComponent],
   templateUrl: './marketing.html',
   styles: [`
     .sub-page { min-height: 100vh; display: flex; flex-direction: column; }

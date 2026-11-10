@@ -1,0 +1,130 @@
+import { CatalogProduct, MySubmission } from '../platform-api.models';
+
+/** Dev-mock catalog in the contract's shape. Not real launch data. */
+export function mockProducts(): CatalogProduct[] {
+  return [
+    {
+      id: 'karagre',
+      name: 'Karagre',
+      tagline: 'Wake with a verse.',
+      summary:
+        'A mantra alarm clock: wake to a verse you chose, read it aloud, and start the day with intention instead of a snooze button.',
+      status: 'building',
+      platforms: ['android', 'ios'],
+      url: '/karagre',
+      imageUrl: '/apps/karagre/icon.png',
+      offer: {
+        id: 'karagre-founder',
+        kind: 'founder',
+        title: 'Founder',
+        perks: [
+          'Lifetime access to every Karagre feature',
+          'Your name in the app credits',
+          'Early builds before the public launch',
+        ],
+        cap: 100,
+        claimed: 37,
+        priceInr: null,
+        currency: 'INR',
+        purchasable: false,
+      },
+    },
+    {
+      id: 'mindful-journal',
+      name: 'Mindful Journal',
+      tagline: 'Train with intention.',
+      summary: 'A training journal for athletes: log sessions, reflect on them, and spot patterns.',
+      status: 'beta',
+      platforms: ['android', 'ios'],
+      url: '/mindful-journal',
+      imageUrl: null,
+      offer: {
+        id: 'mindful-journal-founder',
+        kind: 'founder',
+        title: 'Founder',
+        perks: ['Lifetime premium', 'Shape the roadmap with the team'],
+        cap: 100,
+        claimed: 12,
+        priceInr: null,
+        currency: 'INR',
+        purchasable: false,
+      },
+    },
+    {
+      id: 'mindful-tennis',
+      name: 'Mindful Tennis',
+      tagline: 'Bring mental clarity to your game.',
+      summary: 'Rate each session, track your focus and see your progress on a dashboard.',
+      status: 'live',
+      platforms: ['android', 'ios'],
+      url: '/mindful-tennis',
+      imageUrl: '/apps/mindful-tennis/icon.jpg',
+      offer: null,
+    },
+    {
+      id: 'sudoku',
+      name: 'Sudoku',
+      tagline: 'Classic puzzles, calm design.',
+      summary: 'Thousands of puzzles across difficulty levels with clean, distraction-free play.',
+      status: 'live',
+      platforms: ['android', 'ios'],
+      url: '/sudoku',
+      imageUrl: '/apps/sudoku/icon.png',
+      offer: null,
+    },
+    {
+      id: 'life-mathematics',
+      name: 'Life Mathematics',
+      tagline: 'Everyday maths, made beautiful.',
+      summary: 'A calculator for bills, tips, budgets and beyond.',
+      status: 'beta',
+      platforms: ['android'],
+      url: '/life-mathematics',
+      imageUrl: '/apps/life-mathematics/icon.jpg',
+      offer: null,
+    },
+    {
+      id: 'almari',
+      name: 'Almari',
+      tagline: 'The closet that builds itself.',
+      summary:
+        'Snap your clothes once; try them on virtually, find your colour palette and shop against what you already own.',
+      status: 'idea',
+      platforms: ['android', 'ios', 'web'],
+      url: null,
+      imageUrl: null,
+      offer: {
+        id: 'almari-founder',
+        kind: 'founder',
+        title: 'Founder',
+        perks: ['First access when the beta opens', 'Founder badge'],
+        cap: 100,
+        claimed: 100,
+        priceInr: null,
+        currency: 'INR',
+        purchasable: false,
+      },
+    },
+  ];
+}
+
+export const MOCK_SUBMISSIONS: MySubmission[] = [
+  {
+    id: 'b3c1d5e2-0000-4000-8000-000000000001',
+    kind: 'early_adopter',
+    product: 'karagre',
+    createdAt: '2026-11-08T09:12:00Z',
+  },
+  {
+    id: 'b3c1d5e2-0000-4000-8000-000000000002',
+    kind: 'support',
+    product: 'sudoku',
+    createdAt: '2026-11-02T16:40:00Z',
+  },
+  {
+    id: 'b3c1d5e2-0000-4000-8000-000000000003',
+    kind: 'idea',
+    product: null,
+    createdAt: '2026-10-21T11:05:00Z',
+  },
+];

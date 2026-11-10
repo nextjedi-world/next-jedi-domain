@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { UserMenuComponent } from '../user-menu/user-menu';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { APPS, AppConfig } from '../../apps.config';
 import { EarlyAccessPanelComponent } from '../download-panel/download-panel';
@@ -15,10 +16,17 @@ const CATEGORY_SCHEMA: Record<string, string> = {
 
 @Component({
   selector: 'app-shared-app-page',
-  imports: [RouterLink, EarlyAccessPanelComponent, FooterComponent],
+  imports: [RouterLink, EarlyAccessPanelComponent, FooterComponent, UserMenuComponent],
   templateUrl: './app-page.html',
   styles: [
     `
+    .idea-card-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 20px;
+      font-size: 0.9rem; font-weight: 600; color: var(--accent-dark);
+    }
+    .idea-card-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .idea-card-link .material-symbols-outlined { font-size: 18px; color: var(--accent); }
+
       .app-page {
         min-height: 100vh;
         display: flex;

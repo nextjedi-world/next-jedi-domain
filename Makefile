@@ -1,10 +1,11 @@
 # Repo contract (nextjedi-world/platform docs/CONTRACTS.md):
 #   make setup   install dependencies and git hooks
-#   make dev     run locally (http://localhost:4200)
+#   make dev     run locally (http://localhost:4200) against local Identity :4000 + platform-api :4100
+#   make dev-mock  run locally with platform-api and sign-in mocked in the browser
 #   make verify  lint + format check + typecheck + unit tests + build (what CI and the Stop hook run)
 #   make e2e     smoke test a deployed site: make e2e BASE_URL=https://<preview>.vercel.app
 .DEFAULT_GOAL := verify
-.PHONY: setup dev verify lint format format-check typecheck test build e2e clean
+.PHONY: setup dev dev-mock verify lint format format-check typecheck test build e2e clean
 
 BASE_URL ?=
 export BASE_URL
@@ -17,6 +18,9 @@ setup:
 
 dev:
 	npm start
+
+dev-mock:
+	npx ng serve --configuration mock
 
 lint:
 	npm run lint

@@ -5,11 +5,14 @@ import { APPS, AppConfig } from '../../apps.config';
 import { SUPPORT_CONTENT, AppSupportContent } from '../content/support.content';
 import { FooterComponent } from '../footer/footer';
 import { SeoService } from '../../seo.service';
-import { AuroraService } from '../../aurora/aurora.service';
+import { PlatformApi } from '../../core/platform-api';
+import { SubmissionController } from '../../core/submission';
+import { FormErrorComponent } from '../form-error/form-error';
+import { UserMenuComponent } from '../user-menu/user-menu';
 
 @Component({
   selector: 'app-shared-support',
-  imports: [RouterLink, FooterComponent, ReactiveFormsModule],
+  imports: [RouterLink, FooterComponent, ReactiveFormsModule, FormErrorComponent, UserMenuComponent],
   templateUrl: './support.html',
   styles: [`
     .sub-page { min-height: 100vh; display: flex; flex-direction: column; }
@@ -116,6 +119,7 @@ import { AuroraService } from '../../aurora/aurora.service';
     }
     .form-success .material-symbols-outlined { font-size: 20px; color: #16a34a; flex-shrink: 0; margin-top: 1px; }
     .form-success p { font-size: 0.9rem; color: #15803d; line-height: 1.5; margin: 0; }
+    .field-error { font-size: 0.78rem; color: #c53030; font-weight: 500; }
     .form-error {
       display: flex; align-items: flex-start; gap: 12px;
       background: #fef2f2; border: 1px solid #fecaca;
@@ -151,7 +155,7 @@ import { AuroraService } from '../../aurora/aurora.service';
 export class SharedSupport implements OnInit {
   private route = inject(ActivatedRoute);
   private seo = inject(SeoService);
-  private aurora = inject(AuroraService);
+  private api = inject(PlatformApi);
   private fb = inject(FormBuilder);
 
   protected app: AppConfig = (() => {
@@ -170,16 +174,15 @@ export class SharedSupport implements OnInit {
   protected allApps = APPS;
   protected hasAppContext = !!this.app.slug && APPS.some(a => a.slug === this.app.slug);
 
-  protected contactForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
+  protected contactForm = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email]],
-    app: [this.hasAppContext ? this.app.name : '', Validators.required],
-    message: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]],
+    product: [this.hasAppContext ? this.app.slug : '', Validators.required],
+    message: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(5000)]],
+    website: [''],
   });
 
-  protected isSubmitting = false;
-  protected submitSuccess = false;
-  protected submitError = false;
+  protected readonly submission = new SubmissionController(this.contactForm);
 
   ngOnInit(): void {
     this.seo.set({
@@ -189,27 +192,32 @@ export class SharedSupport implements OnInit {
     });
   }
 
-  protected onSubmitContact(): void {
-    if (this.contactForm.invalid || this.isSubmitting) return;
-    this.isSubmitting = true;
-    this.submitSuccess = false;
-    this.submitError = false;
+  protected fieldError(name: 'name' | 'email' | 'message'): string | null {
+    const ctrl = this.contactForm.controls[name];
+    return ctrl.touched ? ((ctrl.errors?.['server'] as string | undefined) ?? null) : null;
+  }
 
-    const { name, email, app, message } = this.contactForm.value;
-    this.aurora.submitSupport({ name: name!, email: email!, app: app!, message: message! })
-      .subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.submitSuccess = true;
-          this.contactForm.reset();
-          if (this.hasAppContext) {
-            this.contactForm.patchValue({ app: this.app.name });
-          }
-        },
-        error: () => {
-          this.isSubmitting = false;
-          this.submitError = true;
-        },
-      });
+  protected onSubmitContact(): void {
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      return;
+    }
+    const { name, email, product, message, website } = this.contactForm.getRawValue();
+    this.submission.run(
+      this.api.submit({
+        kind: 'support',
+        product,
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim(),
+        website,
+      }),
+      () => {
+        this.contactForm.reset();
+        if (this.hasAppContext) {
+          this.contactForm.patchValue({ product: this.app.slug });
+        }
+      },
+    );
   }
 }

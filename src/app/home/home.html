@@ -7,9 +7,11 @@
         <span class="brand-name">Next Jedi</span>
       </div>
       <nav class="home-nav-links">
+        <a class="home-nav-link keep" routerLink="/ideas">Ideas</a>
         <a class="home-nav-link" routerLink="/aurora">Project Aurora</a>
         <a class="home-nav-link" routerLink="/team">Meet the Team</a>
       </nav>
+      <app-user-menu />
     </div>
   </header>
 
@@ -160,6 +162,22 @@
       </div>
     </section>
   }
+
+  <!-- ── IDEAS ─────────────────────────────────────────────────────── -->
+  <section class="ideas-band">
+    <div class="ideas-band-inner">
+      <div>
+        <span class="ideas-band-eyebrow">Ideas · Founder spots</span>
+        <h2 class="ideas-band-title">See what's next, and get in first.</h2>
+        <p class="ideas-band-sub">
+          Browse everything we're building and reserve a founder spot on the apps you want.
+        </p>
+      </div>
+      <a class="ideas-band-cta" routerLink="/ideas">
+        Explore ideas <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+  </section>
 
   <app-footer />
 </div>
