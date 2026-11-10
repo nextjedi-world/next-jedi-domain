@@ -148,7 +148,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
         heading: '10. We do not sell or share your data',
         paragraphs: [
           'We do not sell any data. We do not share it with advertisers, data brokers or other third parties.',
-          'Data leaves our server only when we publish to a platform. Then it goes to that platform, and only the data needed to publish.',
+          'Data in the publishing tool leaves our server only when we publish to a platform. Then it goes to that platform, and only the data needed to publish.',
           'We will disclose data only if the law requires it.',
         ],
       },
@@ -170,7 +170,9 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       {
         heading: '13. Our website',
         paragraphs: [
-          'nextjedi.com does not use cookies, analytics or advertising trackers. It does not ask you for any personal data.',
+          'nextjedi.com does not use cookies, analytics or advertising trackers. If we add analytics, we will update this policy first.',
+          'Some pages have forms: an app waitlist, a beta tester sign-up, an idea box and a support form. If you fill one in, we collect what you type: usually your name, your email address, the app and platform you chose, and your message.',
+          'Form entries are stored in a Google Sheet that only our team can open, and Google processes them for us. We use them only to reply to you, add you to the waitlist or tester list you asked for, and improve our apps. We delete them on request, as described in section 12.',
           'Our hosting provider, Vercel, may keep standard server logs, such as IP addresses, for security and reliability.',
           'The social publishing tool sets a login cookie only in the browsers of our own team members.',
         ],
