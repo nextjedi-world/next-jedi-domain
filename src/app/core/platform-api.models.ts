@@ -14,6 +14,11 @@ export interface ProductOffer {
   currency: string;
   /** Always false in Phase 1: price is not set yet. */
   purchasable: boolean;
+  /**
+   * Whether the signed-in caller already holds a spot. Only sent when the request carries a
+   * Bearer token; absent for anonymous requests.
+   */
+  reserved?: boolean;
 }
 
 export interface CatalogProduct {
@@ -47,9 +52,15 @@ export interface SubmissionRequest {
   turnstileToken?: string;
 }
 
+/**
+ * `received`: a new submission (201). `already_reserved`: a repeat `early_adopter` for the same
+ * person and product (200); nothing new is stored and `claimed` does not change.
+ */
+export type SubmissionStatus = 'received' | 'already_reserved';
+
 export interface SubmissionResponse {
   id: string;
-  status: 'received';
+  status: SubmissionStatus;
 }
 
 export interface MySubmission {

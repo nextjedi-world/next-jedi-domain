@@ -158,6 +158,17 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.ea-reserved {
+  background: var(--color-surface-low);
+}
+.ea-reserved .ea-success-icon {
+  color: var(--color-primary);
+}
+.ea-reserved-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
 @media (max-width: 560px) {
   .ea-card {
     padding: 24px 20px;

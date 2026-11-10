@@ -22,7 +22,33 @@
     <p class="ea-note">We'll email you once when {{ product().name }} is ready to try.</p>
   }
 
-  @if (submission.state() === 'success') {
+  @if (alreadyReserved()) {
+    <div class="ea-success ea-reserved" role="status">
+      <span class="material-symbols-outlined ea-success-icon" aria-hidden="true"
+        >event_available</span
+      >
+      <div>
+        <p class="ea-success-title">You've already reserved a spot</p>
+        <p class="ea-success-text">
+          @if (auth.isAuthenticated()) {
+            Your {{ offer()?.title ?? 'founder' }} spot for {{ product().name }} is saved to your
+            account. There's nothing more to do; we'll write before pricing is set.
+          } @else {
+            <strong>{{ sentTo() }}</strong> already holds a {{ offer()?.title ?? 'founder' }} spot
+            for {{ product().name }}. We'll write before pricing is set.
+          }
+        </p>
+        <p class="ea-reserved-actions">
+          <a class="ea-link" routerLink="/account">See your reservations</a>
+          @if (!auth.isAuthenticated()) {
+            <button type="button" class="ea-link" (click)="again()">
+              Reserve for someone else
+            </button>
+          }
+        </p>
+      </div>
+    </div>
+  } @else if (submission.state() === 'success') {
     <div class="ea-success" role="status">
       <span class="material-symbols-outlined ea-success-icon" aria-hidden="true">celebration</span>
       <div>

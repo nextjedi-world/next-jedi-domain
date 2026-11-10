@@ -6,9 +6,10 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, delay, mergeMap, of, throwError, timer } from 'rxjs';
+import { MOCK_ACCESS_TOKEN, MOCK_USER } from '../auth/mock-auth.service';
 import { NJ_CONFIG, isPlatformApiUrl } from '../config';
 import { CatalogProduct, SubmissionRequest } from '../platform-api.models';
-import { MOCK_SUBMISSIONS, mockProducts } from './mock-data';
+import { MOCK_RESERVATIONS, MOCK_SUBMISSIONS, mockProducts } from './mock-data';
 
 /** Response latency so loading states are visible. Tests set it to 0. */
 export const mockSettings = { delayMs: 450 };
@@ -19,8 +20,36 @@ function catalog(): CatalogProduct[] {
   products ??= mockProducts();
   return products;
 }
+
+/** Founder spots held, as `<email>|<product>`, so a repeat reserve is `already_reserved`. */
+let reservations: Set<string> | null = null;
+function held(): Set<string> {
+  reservations ??= new Set(MOCK_RESERVATIONS.map((r) => reservationKey(r.email, r.product)));
+  return reservations;
+}
+function reservationKey(email: string, product: string): string {
+  return `${email.trim().toLowerCase()}|${product}`;
+}
+
 export function resetMockCatalog(): void {
   products = null;
+  reservations = null;
+}
+
+/** The email behind the request's Bearer token (the dev mock has one user), or null. */
+function callerEmail(req: HttpRequest<unknown>): string | null {
+  const auth = req.headers.get('Authorization');
+  if (!auth) return null;
+  return auth === `Bearer ${MOCK_ACCESS_TOKEN}` ? MOCK_USER.email : null;
+}
+
+/** Like the real API: `offer.reserved` only when the request carries a Bearer token. */
+function forCaller(product: CatalogProduct, email: string | null): CatalogProduct {
+  if (!email || !product.offer) return product;
+  return {
+    ...product,
+    offer: { ...product.offer, reserved: held().has(reservationKey(email, product.id)) },
+  };
 }
 
 /**
@@ -28,6 +57,8 @@ export function resetMockCatalog(): void {
  * words makes POST /v1/submissions fail that way:
  *   ratelimit -> 429, servererror -> 500, invalid -> 400 with `fields`.
  * `?mockCatalog=empty` or `?mockCatalog=error` on the page URL does the same for the catalog.
+ * The mock user (asha@example.com) already holds the Karagre founder spot, so signing in shows
+ * the "already reserved" card there; reserving again with any email returns `already_reserved`.
  */
 function submissionScenario(body: SubmissionRequest | null): string | null {
   const text = `${body?.email ?? ''} ${body?.name ?? ''}`.toLowerCase();
@@ -77,9 +108,14 @@ function handleSubmission(req: HttpRequest<unknown>): Observable<HttpResponse<un
   }
   const fields = validate(body);
   if (Object.keys(fields).length) return fail(req.url, 400, { error: 'validation', fields });
-  if (body?.kind === 'early_adopter' && body.product && !body.website) {
+  if (body?.kind === 'early_adopter' && body.product && body.email && !body.website) {
+    const key = reservationKey(body.email, body.product);
+    if (held().has(key)) return ok({ id: crypto.randomUUID(), status: 'already_reserved' }, 200);
     const offer = catalog().find((p) => p.id === body.product)?.offer;
-    if (offer && offer.claimed < offer.cap) offer.claimed += 1;
+    if (offer && offer.claimed < offer.cap) {
+      offer.claimed += 1;
+      held().add(key);
+    }
   }
   return ok({ id: crypto.randomUUID(), status: 'received' }, 201);
 }
@@ -94,12 +130,18 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.method === 'GET' && path === '/v1/catalog') {
     const scenario = catalogScenario();
     if (scenario === 'error') return fail(req.url, 503, { error: 'unavailable' });
-    return ok({ workspace: config.workspace, products: scenario === 'empty' ? [] : catalog() });
+    const email = callerEmail(req);
+    return ok({
+      workspace: config.workspace,
+      products: scenario === 'empty' ? [] : catalog().map((p) => forCaller(p, email)),
+    });
   }
   const one = /^\/v1\/catalog\/([^/]+)$/.exec(path);
   if (req.method === 'GET' && one) {
     const product = catalog().find((p) => p.id === decodeURIComponent(one[1]));
-    return product ? ok(product) : fail(req.url, 404, { error: 'not_found' });
+    return product
+      ? ok(forCaller(product, callerEmail(req)))
+      : fail(req.url, 404, { error: 'not_found' });
   }
   if (req.method === 'POST' && path === '/v1/submissions') return handleSubmission(req);
   if (path.startsWith('/v1/me/')) {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
@@ -12,6 +12,10 @@ import { OfferProgressComponent } from './offer-progress';
  * The early-adopter card on /ideas/:slug. With a founder offer it files a `kind: early_adopter`
  * submission ("Reserve my spot"); without one, or once the offer is full, a `waitlist` one.
  * Signed-in people skip name and email; their account's are used.
+ *
+ * People who already hold a spot see an "already reserved" state instead of the form: either the
+ * catalog said so (`offer.reserved`, sent for signed-in requests) or a submit came back
+ * `already_reserved`.
  */
 @Component({
   selector: 'app-early-adopter-card',
@@ -48,6 +52,19 @@ export class EarlyAdopterCardComponent {
   );
   protected readonly signedInEmail = computed(() => this.auth.user()?.email ?? null);
 
+  /**
+   * A submit came back `already_reserved`. Cleared when the product or the signed-in person
+   * changes, so it never leaks across products or accounts.
+   */
+  private readonly repeatSubmit = linkedSignal({
+    source: () => `${this.product().id}|${this.auth.user()?.sub ?? ''}`,
+    computation: () => false,
+  });
+  /** This person already holds a spot on this offer. */
+  protected readonly alreadyReserved = computed(
+    () => this.offer()?.reserved === true || this.repeatSubmit(),
+  );
+
   protected submit(): void {
     const user = this.auth.user();
     const base: SubmissionRequest = {
@@ -66,13 +83,19 @@ export class EarlyAdopterCardComponent {
       const { name, email } = this.form.getRawValue();
       body = { ...base, name: name.trim(), email: email.trim() };
     }
-    this.submission.run(this.api.submit(body), () => {
+    this.submission.run(this.api.submit(body), (res) => {
       this.sentTo.set(body.email ?? '');
+      if (res.status === 'already_reserved') {
+        // Nothing new was stored and the count did not change, so no refresh is needed.
+        this.repeatSubmit.set(true);
+        return;
+      }
       this.reserved.emit();
     });
   }
 
   protected again(): void {
+    this.repeatSubmit.set(false);
     this.submission.reset();
   }
 }

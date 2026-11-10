@@ -2,7 +2,8 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { NJ_CONFIG } from '../config';
-import { CatalogProduct } from '../platform-api.models';
+import { MOCK_ACCESS_TOKEN } from '../auth/mock-auth.service';
+import { CatalogProduct, CatalogResponse } from '../platform-api.models';
 import { TEST_CONFIG } from '../testing';
 import { mockApiInterceptor, mockSettings, resetMockCatalog } from './mock-api.interceptor';
 
@@ -50,6 +51,51 @@ describe('mockApiInterceptor', () => {
     expect(res).toMatchObject({ status: 'received' });
     const p = await firstValueFrom(http.get<CatalogProduct>(`${api}/v1/catalog/karagre`));
     expect(p.offer?.claimed).toBe(38);
+  });
+
+  it('sends offer.reserved only to signed-in requests', async () => {
+    const signedIn = { headers: { Authorization: `Bearer ${MOCK_ACCESS_TOKEN}` } };
+    const anon = await firstValueFrom(http.get<CatalogProduct>(`${api}/v1/catalog/karagre`));
+    expect(anon.offer).not.toHaveProperty('reserved');
+
+    const karagre = await firstValueFrom(
+      http.get<CatalogProduct>(`${api}/v1/catalog/karagre`, signedIn),
+    );
+    expect(karagre.offer?.reserved).toBe(true);
+    const all = await firstValueFrom(http.get<CatalogResponse>(`${api}/v1/catalog`, signedIn));
+    expect(all.products.find((p) => p.id === 'mindful-journal')?.offer?.reserved).toBe(false);
+    expect(all.products.find((p) => p.id === 'sudoku')?.offer).toBeNull();
+  });
+
+  it('answers a repeat reservation with 200 already_reserved and does not count it', async () => {
+    const reserve = (email: string) =>
+      firstValueFrom(
+        http.post(
+          `${api}/v1/submissions`,
+          { ws: 'nextjedi', kind: 'early_adopter', product: 'mindful-journal', email },
+          { observe: 'response' },
+        ),
+      );
+    const first = await reserve('a@b.co');
+    expect(first.status).toBe(201);
+    expect(first.body).toMatchObject({ status: 'received' });
+    const again = await reserve('A@B.co');
+    expect(again.status).toBe(200);
+    expect(again.body).toMatchObject({ status: 'already_reserved' });
+    const p = await firstValueFrom(http.get<CatalogProduct>(`${api}/v1/catalog/mindful-journal`));
+    expect(p.offer?.claimed).toBe(13);
+  });
+
+  it('knows the mock user already holds the Karagre spot', async () => {
+    const res = await firstValueFrom(
+      http.post(`${api}/v1/submissions`, {
+        ws: 'nextjedi',
+        kind: 'early_adopter',
+        product: 'karagre',
+        email: 'asha@example.com',
+      }),
+    );
+    expect(res).toMatchObject({ status: 'already_reserved' });
   });
 
   it('returns the contract errors', async () => {

@@ -128,3 +128,8 @@ export const MOCK_SUBMISSIONS: MySubmission[] = [
     createdAt: '2026-10-21T11:05:00Z',
   },
 ];
+
+/** Founder spots already held when the mock starts: the mock user's Karagre reservation. */
+export const MOCK_RESERVATIONS: { email: string; product: string }[] = [
+  { email: 'asha@example.com', product: 'karagre' },
+];
