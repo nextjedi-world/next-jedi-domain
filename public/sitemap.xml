@@ -18,6 +18,13 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Company legal -->
+  <url>
+    <loc>https://nextjedi.com/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
   <!-- Flow Timer -->
   <url>
     <loc>https://nextjedi.com/flowtimer</loc>

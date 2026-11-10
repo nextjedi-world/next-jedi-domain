@@ -44,6 +44,19 @@
               }
             </ul>
           }
+          @if (section.links) {
+            <ul class="links">
+              @for (link of section.links; track link.href) {
+                <li>
+                  @if (link.href.startsWith('mailto:')) {
+                    <a [href]="link.href">{{ link.label }}</a>
+                  } @else {
+                    <a [href]="link.href" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+                  }
+                </li>
+              }
+            </ul>
+          }
         }
       } @else {
         <h1>Not found</h1>

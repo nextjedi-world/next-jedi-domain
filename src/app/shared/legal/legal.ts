@@ -37,6 +37,8 @@ import { SeoService } from '../../seo.service';
     ul { padding-left: 20px; margin: 8px 0 0; }
     li { color: var(--color-text-muted); line-height: 1.7; font-size: 0.95rem; margin-bottom: 4px; }
     a[href^="mailto"] { color: var(--accent); }
+    p { overflow-wrap: anywhere; }
+    .links a { color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
   `],
 })
 export class SharedLegal implements OnInit {

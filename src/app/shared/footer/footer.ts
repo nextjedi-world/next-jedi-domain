@@ -22,6 +22,7 @@ import { RouterLink } from '@angular/router';
             <a class="footer-link" [routerLink]="'/' + appSlug() + '/privacy-policy'">Privacy Policy</a>
             <a class="footer-link" [routerLink]="'/' + appSlug() + '/support'">Support</a>
           }
+          <a class="footer-link" routerLink="/privacy">{{ appSlug() ? 'Company Privacy' : 'Privacy Policy' }}</a>
           <a class="footer-link" routerLink="/terms">Terms &amp; Conditions</a>
           <a class="footer-link" routerLink="/refund">Refund Policy</a>
           <a class="footer-link" routerLink="/shipping">Shipping</a>
