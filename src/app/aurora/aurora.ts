@@ -1,13 +1,14 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuroraService } from './aurora.service';
 import { SeoService } from '../seo.service';
 import { FooterComponent } from '../shared/footer/footer';
+import { FormErrorComponent } from '../shared/form-error/form-error';
 
 @Component({
   selector: 'app-aurora',
-  imports: [RouterLink, ReactiveFormsModule, FooterComponent],
+  imports: [RouterLink, ReactiveFormsModule, FooterComponent, FormErrorComponent],
   templateUrl: './aurora.html',
   styles: [
     `
@@ -535,6 +536,7 @@ export class AuroraPage implements OnInit {
   private fb = inject(FormBuilder);
   private aurora = inject(AuroraService);
   private seo = inject(SeoService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.seo.set({
@@ -572,9 +574,13 @@ export class AuroraPage implements OnInit {
     this.aurora.submitWaitlist({ name: name!, email: email!, feature: feature! }).subscribe({
       next: () => {
         this.waitlistState = 'success';
+        this.cdr.markForCheck();
         this.waitlistForm.reset();
       },
-      error: () => { this.waitlistState = 'error'; },
+      error: () => {
+        this.waitlistState = 'error';
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -584,9 +590,13 @@ export class AuroraPage implements OnInit {
     this.aurora.submitIdea({ description: description! }).subscribe({
       next: () => {
         this.ideaState = 'success';
+        this.cdr.markForCheck();
         this.ideaForm.reset();
       },
-      error: () => { this.ideaState = 'error'; },
+      error: () => {
+        this.ideaState = 'error';
+        this.cdr.markForCheck();
+      },
     });
   }
 

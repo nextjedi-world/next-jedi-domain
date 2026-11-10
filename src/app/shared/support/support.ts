@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { APPS, AppConfig } from '../../apps.config';
@@ -6,10 +6,11 @@ import { SUPPORT_CONTENT, AppSupportContent } from '../content/support.content';
 import { FooterComponent } from '../footer/footer';
 import { SeoService } from '../../seo.service';
 import { AuroraService } from '../../aurora/aurora.service';
+import { FormErrorComponent } from '../form-error/form-error';
 
 @Component({
   selector: 'app-shared-support',
-  imports: [RouterLink, FooterComponent, ReactiveFormsModule],
+  imports: [RouterLink, FooterComponent, ReactiveFormsModule, FormErrorComponent],
   templateUrl: './support.html',
   styles: [`
     .sub-page { min-height: 100vh; display: flex; flex-direction: column; }
@@ -153,6 +154,7 @@ export class SharedSupport implements OnInit {
   private seo = inject(SeoService);
   private aurora = inject(AuroraService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   protected app: AppConfig = (() => {
     const slug = this.route.snapshot.data['appSlug'] ?? '';
@@ -201,6 +203,7 @@ export class SharedSupport implements OnInit {
         next: () => {
           this.isSubmitting = false;
           this.submitSuccess = true;
+          this.cdr.markForCheck();
           this.contactForm.reset();
           if (this.hasAppContext) {
             this.contactForm.patchValue({ app: this.app.name });
@@ -209,6 +212,7 @@ export class SharedSupport implements OnInit {
         error: () => {
           this.isSubmitting = false;
           this.submitError = true;
+          this.cdr.markForCheck();
         },
       });
   }
