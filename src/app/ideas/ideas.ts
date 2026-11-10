@@ -1,5 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { onViewerChange } from '../core/auth/viewer';
 import { PlatformApi } from '../core/platform-api';
 import { CatalogProduct } from '../core/platform-api.models';
 import { SeoService } from '../seo.service';
@@ -34,6 +36,12 @@ export class IdeasPage implements OnInit {
   protected readonly state = signal<'loading' | 'ready' | 'error'>('loading');
   protected readonly products = signal<CatalogProduct[]>([]);
   protected readonly platformLabels = PLATFORM_LABELS;
+  private request?: Subscription;
+
+  constructor() {
+    // `offer.reserved` depends on who is asking: refresh after sign-in or sign-out.
+    onViewerChange(() => this.load(true));
+  }
 
   ngOnInit(): void {
     this.seo.set({
@@ -46,14 +54,19 @@ export class IdeasPage implements OnInit {
     this.load();
   }
 
-  protected load(): void {
-    this.state.set('loading');
-    this.api.catalog().subscribe({
+  /** `quiet` keeps the current list on screen (no skeleton) and keeps it if the reload fails. */
+  protected load(quiet = false): void {
+    if (!quiet) this.state.set('loading');
+    this.request?.unsubscribe();
+    this.request = this.api.catalog().subscribe({
       next: (res) => {
         this.products.set(res.products ?? []);
         this.state.set('ready');
       },
-      error: () => this.state.set('error'),
+      error: () => {
+        if (quiet && this.state() === 'ready') return;
+        this.state.set('error');
+      },
     });
   }
 }

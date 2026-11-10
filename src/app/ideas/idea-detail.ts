@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { onViewerChange } from '../core/auth/viewer';
 import { PlatformApi } from '../core/platform-api';
 import { CatalogProduct } from '../core/platform-api.models';
 import { SeoService } from '../seo.service';
@@ -34,6 +36,15 @@ export class IdeaDetailPage implements OnInit {
   protected readonly product = signal<CatalogProduct | null>(null);
   protected readonly platformLabels = PLATFORM_LABELS;
   protected slug = '';
+  private request?: Subscription;
+
+  constructor() {
+    // `offer.reserved` depends on who is asking: refresh it after sign-in, sign-out or a session
+    // restore that finishes after the first load.
+    onViewerChange(() => {
+      if (this.slug) this.load(true);
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -45,7 +56,9 @@ export class IdeaDetailPage implements OnInit {
 
   protected load(quiet = false): void {
     if (!quiet) this.state.set('loading');
-    this.api.product(this.slug).subscribe({
+    // Only the latest response counts (a reload may overtake an earlier, anonymous one).
+    this.request?.unsubscribe();
+    this.request = this.api.product(this.slug).subscribe({
       next: (p) => {
         this.product.set(p);
         this.state.set('ready');

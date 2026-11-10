@@ -2,6 +2,7 @@ import { HttpClient, HttpContext, provideHttpClient, withInterceptors } from '@a
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { NJ_CONFIG } from '../config';
+import { PlatformApi } from '../platform-api';
 import { FakeAuthService, TEST_CONFIG, TEST_USER } from '../testing';
 import { authTokenInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
@@ -52,6 +53,34 @@ describe('authTokenInterceptor', () => {
     expect(ctrl.expectOne('https://example.com/x').request.headers.has('Authorization')).toBe(
       false,
     );
+    expect(auth.getAccessToken).not.toHaveBeenCalled();
+  });
+
+  it('adds the Bearer token to the catalog and product requests when signed in', async () => {
+    const api = TestBed.inject(PlatformApi);
+    api.catalog().subscribe();
+    api.product('karagre').subscribe();
+    await tick();
+    const catalog = ctrl.expectOne((r) => r.url === 'http://localhost:4100/v1/catalog');
+    const product = ctrl.expectOne((r) => r.url === 'http://localhost:4100/v1/catalog/karagre');
+    expect(catalog.request.headers.get('Authorization')).toBe('Bearer access-1');
+    expect(product.request.headers.get('Authorization')).toBe('Bearer access-1');
+    catalog.flush({ workspace: 'nextjedi', products: [] });
+    product.flush({});
+  });
+
+  it('does not treat look-alike origins as platform-api', async () => {
+    const lookalikes = [
+      'http://localhost:41000/v1/catalog',
+      'http://localhost:4100.evil.example/v1/catalog',
+      'https://localhost:4100/v1/catalog',
+      'http://evil.example/http://localhost:4100/v1/catalog',
+    ];
+    for (const url of lookalikes) http.get(url).subscribe();
+    await tick();
+    for (const url of lookalikes) {
+      expect(ctrl.expectOne(url).request.headers.has('Authorization')).toBe(false);
+    }
     expect(auth.getAccessToken).not.toHaveBeenCalled();
   });
 

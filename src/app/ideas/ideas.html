@@ -73,9 +73,11 @@
                     }
                     <span class="card-cta">
                       {{
-                        p.offer && p.offer.claimed < p.offer.cap
-                          ? 'Reserve a founder spot'
-                          : 'See the idea'
+                        p.offer?.reserved
+                          ? 'Your spot is reserved'
+                          : p.offer && p.offer.claimed < p.offer.cap
+                            ? 'Reserve a founder spot'
+                            : 'See the idea'
                       }}
                       <span class="material-symbols-outlined">arrow_forward</span>
                     </span>
