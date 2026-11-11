@@ -106,10 +106,7 @@
               </div>
             }
             @if (submitError) {
-              <div class="form-error">
-                <span class="material-symbols-outlined">error</span>
-                <p>Something went wrong. Please email <strong>{{ contactEmail }}</strong> directly.</p>
-              </div>
+              <app-form-error [subject]="'Support request'" (retry)="onSubmitContact()" />
             }
           </form>
         </div>

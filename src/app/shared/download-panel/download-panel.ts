@@ -2,13 +2,14 @@ import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuroraService } from '../../aurora/aurora.service';
 import { AppStage } from '../../apps.config';
+import { FormErrorComponent } from '../form-error/form-error';
 
 export type EarlyAccessPlatform = 'android' | 'ios';
 
 @Component({
   selector: 'app-early-access-panel',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormErrorComponent],
   template: `
     <div class="panel-backdrop" (click)="closed.emit()"></div>
 
@@ -53,7 +54,7 @@ export type EarlyAccessPlatform = 'android' | 'ios';
               </p>
 
               @if (formState() === 'error') {
-                <div class="form-error-banner">Something went wrong — please try again.</div>
+                <app-form-error [subject]="errorSubject" (retry)="onSubmit()" />
               }
 
               <form class="waitlist-form" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -125,7 +126,7 @@ export type EarlyAccessPlatform = 'android' | 'ios';
               </p>
 
               @if (formState() === 'error') {
-                <div class="form-error-banner">Something went wrong — please try again.</div>
+                <app-form-error [subject]="errorSubject" (retry)="onSubmit()" />
               }
 
               <form class="waitlist-form" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -537,6 +538,7 @@ export class EarlyAccessPanelComponent implements OnInit {
   get nameCtrl() { return this.form.get('name')!; }
   get emailCtrl() { return this.form.get('email')!; }
 
+  get errorSubject() { return `${this.appName || 'App'} ${this.platformLabel} waitlist`; }
   get platformLabel() { return this.platform === 'android' ? 'Android' : 'iOS'; }
   get storeName() { return this.platform === 'android' ? 'Play Store' : 'App Store'; }
 

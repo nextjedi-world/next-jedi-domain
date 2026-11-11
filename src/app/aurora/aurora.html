@@ -66,7 +66,7 @@
           } @else {
             <form class="access-form" [formGroup]="waitlistForm" (ngSubmit)="onJoinWaitlist()">
               @if (waitlistState === 'error') {
-                <div class="form-error-banner">Something went wrong. Please try again.</div>
+                <app-form-error subject="Project Aurora waitlist" (retry)="onJoinWaitlist()" />
               }
               <div class="form-row-2">
                 <div class="form-field">
@@ -137,7 +137,7 @@
             } @else {
               <form class="request-form" [formGroup]="ideaForm" (ngSubmit)="onSubmitIdea()">
                 @if (ideaState === 'error') {
-                  <div class="form-error-banner">Something went wrong. Please try again.</div>
+                  <app-form-error subject="Project Aurora idea" (retry)="onSubmitIdea()" />
                 }
                 <div class="form-field">
                   <div class="field-label-row">
