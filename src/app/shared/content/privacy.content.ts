@@ -1,12 +1,21 @@
 export interface PrivacyBullet {
   label?: string;
   text: string;
+  /** Renders `text` as a link (e.g. a mailto). */
+  href?: string;
 }
 
 export interface PrivacySection {
   heading: string;
   paragraphs: string[];
+  /** Paragraphs that open with a bold lead-in (`label`), shown after `paragraphs`. */
+  leads?: PrivacyBullet[];
+  table?: { headers: string[]; rows: string[][] };
   bullets?: PrivacyBullet[];
+  /** Paragraphs shown after the table and bullets. */
+  paragraphsAfter?: string[];
+  /** Style `leads` as a compact contact block. */
+  contact?: boolean;
 }
 
 export interface AppPrivacyContent {
@@ -202,85 +211,114 @@ export const PRIVACY_CONTENT: Record<string, AppPrivacyContent> = {
     ],
   },
 
+  // Mindful Tennis. Approved text: MindfulTennis repo PRIVACY_POLICY.md (commit 091eac3), word for
+  // word. NEXTJ-8. Do not name vendors or technologies on this page (owner rule).
   'mindful-tennis': {
-    lastUpdated: 'April 5, 2026',
-    intro: 'Mindful Tennis ("the app") is built by Next Jedi. This page explains what data the app collects, how it is stored and used, and the rights you have over it.',
+    lastUpdated: 'November 11, 2026',
+    intro: 'This policy explains what information Mindful Tennis collects, why, and the choices you have. It is written to meet the information requirements of the EU and UK General Data Protection Regulation (GDPR), India\'s Digital Personal Data Protection Act, 2023, and the California Consumer Privacy Act (CCPA).',
     sections: [
       {
-        heading: '1. Information We Collect',
-        paragraphs: ['When you sign in with Google, the app receives:'],
+        heading: '1. Who we are',
+        paragraphs: [
+          'Mindful Tennis ("we", "us", "the app") is a tennis journaling and progress-tracking app for Android and iOS. We are responsible for the personal information described here. Contact details are in section 11.',
+        ],
+      },
+      {
+        heading: '2. What we collect',
+        paragraphs: [],
+        leads: [
+          { label: 'Account details.', text: 'Your email address, name and profile picture, provided when you create an account or sign in with Google or Apple. We never see your Google or Apple password.' },
+          { label: 'What you record.', text: 'Your practice and match sessions, notes, ratings, set scores, opponent and partner names, and focus areas.' },
+          { label: 'Subscription status.', text: 'Whether you have an active trial or subscription. Payments are handled by the App Store or Google Play; we never receive your card details.' },
+          { label: 'App usage (optional).', text: 'Which screens you visit and which steps you complete, app version, device type and approximate country. On some devices this includes a recording of how you move through screens, with everything you type and your personal content hidden. You can turn this off at any time (see section 7).' },
+        ],
+        paragraphsAfter: [
+          'We do not collect precise location, contacts, photos, or advertising identifiers.',
+        ],
+      },
+      {
+        heading: '3. Why we use it',
+        paragraphs: [],
+        table: {
+          headers: ['Purpose', 'Information', 'Legal basis'],
+          rows: [
+            ['Run the app, keep your data in sync and backed up', 'Account details, what you record', 'Providing the service you asked for'],
+            ['Unlock paid features', 'Subscription status', 'Providing the service you asked for'],
+            ['Send account emails (welcome, password reset, important notices)', 'Email address, name', 'Providing the service you asked for'],
+            ['Find and fix confusing or broken parts of the app', 'App usage', 'Your consent, which you can withdraw'],
+          ],
+        },
+        paragraphsAfter: [
+          'We do not sell your information, use it for advertising, or build advertising profiles.',
+        ],
+      },
+      {
+        heading: '4. Who we share it with',
+        paragraphs: [
+          'We share information only with service providers that help us run the app, under contracts that require them to protect it and use it only on our instructions:',
+        ],
         bullets: [
-          { label: 'Account info', text: '— your email address, display name, and profile photo.' },
-          { label: 'Timezone', text: '— your device\'s local timezone, used to group sessions by day.' },
+          { text: 'secure cloud hosting and storage' },
+          { text: 'sign-in providers (Google, Apple), if you choose them' },
+          { text: 'app stores, for subscriptions' },
+          { text: 'email delivery' },
+          { text: 'product analytics (only if you have not turned it off)' },
+        ],
+        paragraphsAfter: [
+          'We may also disclose information if the law requires it.',
         ],
       },
       {
-        heading: '2. User-Generated Content',
-        paragraphs: ['As you use the app, you create:'],
+        heading: '5. Where it is stored',
+        paragraphs: [
+          'Your information is stored on your device and with our hosting providers, which may be outside your country. Where that happens we rely on recognised safeguards, such as the European Commission\'s Standard Contractual Clauses.',
+        ],
+      },
+      {
+        heading: '6. How long we keep it',
+        paragraphs: [
+          'As long as your account is active. When you delete your account, we delete your information within 30 days, except where the law requires us to keep it longer. Usage data is kept for no more than 12 months.',
+        ],
+      },
+      {
+        heading: '7. Your choices and rights',
+        paragraphs: [],
         bullets: [
-          { label: 'Session records', text: '— date, duration, focus point, aspect ratings (1–5), set scores, and any notes you add.' },
-          { label: 'Opponents and partners', text: '— names you enter manually, with win/loss records.' },
-          { label: 'Focus points', text: '— coaching topics and their effectiveness scores over time.' },
+          { label: 'Turn off usage analytics:', text: 'Settings → Privacy → Share usage analytics.' },
+          { label: 'See and correct your data:', text: 'everything you record is visible and editable in the app.' },
+          { label: 'Delete your account:', text: 'in the app\'s Settings, or by emailing us.' },
+          { label: 'Other requests:', text: 'you can ask us for a copy of your information, ask us to correct, delete or stop using it, or withdraw consent. Email us and we will reply within 30 days.' },
+        ],
+        paragraphsAfter: [
+          'If you are unhappy with how we handled a request, you can complain to your local data protection authority (in India, the Data Protection Board of India).',
         ],
       },
       {
-        heading: '3. What We Do Not Collect',
+        heading: '8. Security',
         paragraphs: [
-          'We do not collect your location, device identifiers, IP address, browsing behaviour, or any analytics about how you use the app.',
+          'Information is encrypted in transit, and each account can only access its own data. No system is completely secure, but we work to protect your information and will tell you if a breach affects you, as the law requires.',
         ],
       },
       {
-        heading: '4. How We Use Your Information',
+        heading: '9. Children',
         paragraphs: [
-          'All data is used exclusively to provide the app\'s functionality — displaying your session history, performance trends, and opponent records. We do not use your data for advertising, profiling, or any purpose beyond delivering the service to you.',
+          'Mindful Tennis is not intended for children under 13 (or the minimum age in your country). We do not knowingly collect information from children. If you think a child has given us information, contact us and we will delete it.',
         ],
       },
       {
-        heading: '5. Data Storage and Sync',
+        heading: '10. Changes',
         paragraphs: [
-          'Your data is stored locally on your device first. When you are signed in and online, it is synced to a secure Supabase (PostgreSQL) database. Row Level Security ensures that only your account can read or write your data — no other user or staff member can access it.',
+          'If we change this policy, we will update the date above. For significant changes we will let you know in the app or by email.',
         ],
       },
       {
-        heading: '6. Third-Party Services',
-        paragraphs: ['The app uses the following third-party services:'],
-        bullets: [
-          { label: 'Supabase', text: '— cloud database and authentication backend. Receives all user-generated content when syncing.' },
-          { label: 'Google OAuth', text: '— sign-in only. Receives your email, name, and profile photo.' },
+        heading: '11. Contact',
+        paragraphs: [],
+        leads: [
+          { label: 'Developer:', text: 'Ashutosh' },
+          { label: 'Email:', text: 'ashutoshpriyadarshiardor@gmail.com', href: 'mailto:ashutoshpriyadarshiardor@gmail.com' },
         ],
-      },
-      {
-        heading: '7. Permissions',
-        paragraphs: ['Mindful Tennis requests the following permissions:'],
-        bullets: [
-          { label: 'POST_NOTIFICATIONS', text: '(Android 13+) — persistent timer notification during active sessions.' },
-          { label: 'FOREGROUND_SERVICE', text: '— keeps the timer running accurately when the screen is off.' },
-          { label: 'INTERNET', text: '— required for Google Sign-In and cloud sync.' },
-        ],
-      },
-      {
-        heading: '8. Your Rights',
-        paragraphs: [
-          'You can request to access, export, or permanently delete all data associated with your account at any time by contacting us at arunabh@nextjedi.com. We will respond within 30 days.',
-        ],
-      },
-      {
-        heading: '9. Data Retention',
-        paragraphs: [
-          'Your data is retained as long as your account is active. Deleting the app does not delete your cloud data — you must request account deletion explicitly.',
-        ],
-      },
-      {
-        heading: '10. Children\'s Privacy',
-        paragraphs: ['Mindful Tennis is not directed at children under 13. We do not knowingly collect personal information from children under 13.'],
-      },
-      {
-        heading: '11. Changes to This Policy',
-        paragraphs: ['If we change how the app handles your data, we will update this page and revise the "last updated" date above.'],
-      },
-      {
-        heading: '12. Contact',
-        paragraphs: ['Questions? Reach us at arunabh@nextjedi.com.'],
+        contact: true,
       },
     ],
   },

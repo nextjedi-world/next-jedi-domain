@@ -37,6 +37,41 @@ import { SeoService } from '../../seo.service';
     ul { padding-left: 20px; margin: 8px 0 0; }
     li { color: var(--color-text-muted); line-height: 1.7; font-size: 0.95rem; margin-bottom: 4px; }
     a[href^="mailto"] { color: var(--accent); }
+    .contact-block a { overflow-wrap: anywhere; }
+    .lead-para + .lead-para { margin-top: 12px; }
+    .para-after { margin-top: 12px; }
+    .contact-block {
+      padding: 16px 20px; border-radius: 12px;
+      background: var(--accent-light); border-left: 3px solid var(--accent);
+    }
+    .contact-block .lead-para + .lead-para { margin-top: 4px; }
+    .policy-table-wrap { margin-top: 12px; }
+    .policy-table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem;
+      border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden;
+    }
+    .policy-table th {
+      text-align: left; font-family: var(--font-headline); font-weight: 700; font-size: 0.8rem;
+      color: var(--color-text); background: var(--accent-light); padding: 10px 14px;
+    }
+    .policy-table td {
+      vertical-align: top; color: var(--color-text-muted); line-height: 1.55;
+      padding: 10px 14px; border-top: 1px solid var(--color-border);
+    }
+    @media (max-width: 640px) {
+      .policy-table, .policy-table tbody, .policy-table tr, .policy-table td { display: block; width: 100%; }
+      .policy-table { border: none; }
+      .policy-table thead { display: none; }
+      .policy-table tr {
+        border: 1px solid var(--color-border); border-radius: 12px;
+        padding: 6px 0; margin-bottom: 12px;
+      }
+      .policy-table td { border-top: none; padding: 6px 16px; }
+      .policy-table td::before {
+        content: attr(data-label); display: block; font-size: 0.7rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent);
+      }
+    }
   `],
 })
 export class SharedPrivacyPolicy implements OnInit {

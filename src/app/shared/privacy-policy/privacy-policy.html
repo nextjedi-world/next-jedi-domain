@@ -39,6 +39,36 @@
           @for (para of section.paragraphs; track $index) {
             <p>{{ para }}</p>
           }
+          @if (section.leads) {
+            <div [class.contact-block]="section.contact">
+              @for (lead of section.leads; track $index) {
+                <p class="lead-para">
+                  @if (lead.label) {<strong>{{ lead.label }}</strong>&ngsp;}
+                  @if (lead.href) {<a [href]="lead.href">{{ lead.text }}</a>} @else { {{ lead.text }} }
+                </p>
+              }
+            </div>
+          }
+          @if (section.table) {
+            <div class="policy-table-wrap">
+              <table class="policy-table">
+                <thead>
+                  <tr>
+                    @for (h of section.table.headers; track $index) {<th scope="col">{{ h }}</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of section.table.rows; track $index) {
+                    <tr>
+                      @for (cell of row; track $index; let i = $index) {
+                        <td [attr.data-label]="section.table.headers[i]">{{ cell }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
           @if (section.bullets) {
             <ul>
               @for (bullet of section.bullets; track $index) {
@@ -48,6 +78,9 @@
                 </li>
               }
             </ul>
+          }
+          @for (para of section.paragraphsAfter ?? []; track $index) {
+            <p class="para-after">{{ para }}</p>
           }
         }
       } @else {
