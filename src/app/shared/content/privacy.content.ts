@@ -316,7 +316,7 @@ export const PRIVACY_CONTENT: Record<string, AppPrivacyContent> = {
         paragraphs: [],
         leads: [
           { label: 'Developer:', text: 'Ashutosh' },
-          { label: 'Email:', text: 'ashutoshpriyadarshiardor@gmail.com', href: 'mailto:ashutoshpriyadarshiardor@gmail.com' },
+          { label: 'Email:', text: 'arunabh@nextjedi.com', href: 'mailto:arunabh@nextjedi.com' },
         ],
         contact: true,
       },
