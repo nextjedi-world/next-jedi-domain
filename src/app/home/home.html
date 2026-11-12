@@ -41,6 +41,7 @@
         <div class="app-grid">
           @for (app of launchedApps; track app.slug) {
             <a
+              appReveal
               class="app-card card-launched"
               [routerLink]="'/' + app.slug"
               [style]="{ '--accent': app.accent, '--accent-light': app.accentLight, '--accent-dark': app.accentDark }"
@@ -72,93 +73,111 @@
   }
 
   <!-- ── IN REVIEW ─────────────────────────────────────────────────── -->
-  @if (reviewApps.length > 0) {
-    <section class="phase-section">
-      <div class="phase-inner">
-        <div class="phase-header">
-          <span class="phase-pill pill-review">
-            <span class="pill-dot"></span>
-            In Review
-          </span>
-          <h2 class="phase-title">Under Store Review</h2>
-          <span class="phase-count">{{ reviewApps.length }} {{ reviewApps.length === 1 ? 'app' : 'apps' }}</span>
-        </div>
-        <div class="app-grid">
-          @for (app of reviewApps; track app.slug) {
-            <a
-              class="app-card card-review"
-              [routerLink]="'/' + app.slug"
-              [style]="{ '--accent': app.accent, '--accent-light': app.accentLight, '--accent-dark': app.accentDark }"
-            >
-              <div class="card-header">
-                <div class="card-icon-wrap">
-                  @if (app.iconImage) {
-                    <img class="card-icon-img" [src]="app.iconImage" [alt]="app.name" />
-                  } @else {
-                    <span class="material-symbols-outlined card-icon">{{ app.icon }}</span>
-                  }
+  @defer (on viewport) {
+    @if (reviewApps.length > 0) {
+      <section class="phase-section">
+        <div class="phase-inner">
+          <div class="phase-header">
+            <span class="phase-pill pill-review">
+              <span class="pill-dot"></span>
+              In Review
+            </span>
+            <h2 class="phase-title">Under Store Review</h2>
+            <span class="phase-count">{{ reviewApps.length }} {{ reviewApps.length === 1 ? 'app' : 'apps' }}</span>
+          </div>
+          <div class="app-grid">
+            @for (app of reviewApps; track app.slug) {
+              <a
+                appReveal
+                class="app-card card-review"
+                [routerLink]="'/' + app.slug"
+                [style]="{ '--accent': app.accent, '--accent-light': app.accentLight, '--accent-dark': app.accentDark }"
+              >
+                <div class="card-header">
+                  <div class="card-icon-wrap">
+                    @if (app.iconImage) {
+                      <img class="card-icon-img" [src]="app.iconImage" [alt]="app.name" />
+                    } @else {
+                      <span class="material-symbols-outlined card-icon">{{ app.icon }}</span>
+                    }
+                  </div>
+                  <span class="card-badge">{{ app.category }}</span>
                 </div>
-                <span class="card-badge">{{ app.category }}</span>
-              </div>
-              <div class="card-body">
-                <h3 class="card-name">{{ app.name }}</h3>
-                <p class="card-desc">{{ app.description }}</p>
-              </div>
-              <div class="card-cta-row">
-                <span class="card-cta">
-                  View app <span class="material-symbols-outlined cta-arrow">arrow_forward</span>
-                </span>
-              </div>
-            </a>
-          }
+                <div class="card-body">
+                  <h3 class="card-name">{{ app.name }}</h3>
+                  <p class="card-desc">{{ app.description }}</p>
+                </div>
+                <div class="card-cta-row">
+                  <span class="card-cta">
+                    View app <span class="material-symbols-outlined cta-arrow">arrow_forward</span>
+                  </span>
+                </div>
+              </a>
+            }
+          </div>
         </div>
+      </section>
+    }
+  } @placeholder {
+    <div class="phase-section" aria-hidden="true">
+      <div class="phase-inner">
+        <nj-skeleton height="220px" />
       </div>
-    </section>
+    </div>
   }
 
   <!-- ── IN DEVELOPMENT ───────────────────────────────────────────── -->
-  @if (devApps.length > 0) {
-    <section class="phase-section">
-      <div class="phase-inner">
-        <div class="phase-header">
-          <span class="phase-pill pill-dev">
-            <span class="pill-dot"></span>
-            Building
-          </span>
-          <h2 class="phase-title">In Development</h2>
-          <span class="phase-count">{{ devApps.length }} {{ devApps.length === 1 ? 'app' : 'apps' }}</span>
-        </div>
-        <div class="app-grid">
-          @for (app of devApps; track app.slug) {
-            <a
-              class="app-card card-dev"
-              [routerLink]="'/' + app.slug"
-              [style]="{ '--accent': app.accent, '--accent-light': app.accentLight, '--accent-dark': app.accentDark }"
-            >
-              <div class="card-header">
-                <div class="card-icon-wrap">
-                  @if (app.iconImage) {
-                    <img class="card-icon-img" [src]="app.iconImage" [alt]="app.name" />
-                  } @else {
-                    <span class="material-symbols-outlined card-icon">{{ app.icon }}</span>
-                  }
+  @defer (on viewport) {
+    @if (devApps.length > 0) {
+      <section class="phase-section">
+        <div class="phase-inner">
+          <div class="phase-header">
+            <span class="phase-pill pill-dev">
+              <span class="pill-dot"></span>
+              Building
+            </span>
+            <h2 class="phase-title">In Development</h2>
+            <span class="phase-count">{{ devApps.length }} {{ devApps.length === 1 ? 'app' : 'apps' }}</span>
+          </div>
+          <div class="app-grid">
+            @for (app of devApps; track app.slug) {
+              <a
+                appReveal
+                class="app-card card-dev"
+                [routerLink]="'/' + app.slug"
+                [style]="{ '--accent': app.accent, '--accent-light': app.accentLight, '--accent-dark': app.accentDark }"
+              >
+                <div class="card-header">
+                  <div class="card-icon-wrap">
+                    @if (app.iconImage) {
+                      <img class="card-icon-img" [src]="app.iconImage" [alt]="app.name" />
+                    } @else {
+                      <span class="material-symbols-outlined card-icon">{{ app.icon }}</span>
+                    }
+                  </div>
+                  <span class="card-badge">{{ app.category }}</span>
                 </div>
-                <span class="card-badge">{{ app.category }}</span>
-              </div>
-              <div class="card-body">
-                <h3 class="card-name">{{ app.name }}</h3>
-                <p class="card-desc">{{ app.description }}</p>
-              </div>
-              <div class="card-cta-row">
-                <span class="card-cta">
-                  View app <span class="material-symbols-outlined cta-arrow">arrow_forward</span>
-                </span>
-              </div>
-            </a>
-          }
+                <div class="card-body">
+                  <h3 class="card-name">{{ app.name }}</h3>
+                  <p class="card-desc">{{ app.description }}</p>
+                </div>
+                <div class="card-cta-row">
+                  <span class="card-cta">
+                    View app <span class="material-symbols-outlined cta-arrow">arrow_forward</span>
+                  </span>
+                </div>
+              </a>
+            }
+          </div>
         </div>
+      </section>
+    }
+  } @placeholder {
+    <div class="phase-section" aria-hidden="true">
+      <div class="phase-inner">
+        <nj-skeleton height="220px" />
       </div>
-    </section>
+    </div>
   }
 
   <app-footer />

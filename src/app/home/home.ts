@@ -2,11 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { APPS } from '../apps.config';
 import { SeoService } from '../seo.service';
+import { NjReveal } from '../shared/reveal/reveal';
+import { NjSkeleton } from '../shared/skeleton/skeleton';
 import { FooterComponent } from '../shared/footer/footer';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FooterComponent],
+  imports: [RouterLink, FooterComponent, NjReveal, NjSkeleton],
   templateUrl: './home.html',
   styles: [
     `
