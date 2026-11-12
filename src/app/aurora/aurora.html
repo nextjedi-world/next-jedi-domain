@@ -4,7 +4,7 @@
   <header class="site-nav">
     <div class="nav-inner">
       <a class="nav-brand" routerLink="/">
-        <span class="material-symbols-outlined brand-icon">grid_view</span>
+        <span class="material-symbols-outlined brand-icon" aria-hidden="true">grid_view</span>
         <span class="brand-name">Next Jedi</span>
       </a>
       <div class="nav-app">
@@ -21,7 +21,7 @@
       <div class="hero-grid">
         <div class="hero-left">
           <div class="coming-badge">
-            <span class="material-symbols-outlined badge-icon">schedule</span>
+            <span class="material-symbols-outlined badge-icon" aria-hidden="true">schedule</span>
             Coming Early 2026
           </div>
           <h1 class="aurora-title">
@@ -37,7 +37,7 @@
             <div class="aurora-layer layer-2"></div>
             <div class="aurora-layer layer-3"></div>
             <div class="aurora-label-wrap">
-              <span class="material-symbols-outlined aurora-star">auto_awesome</span>
+              <span class="material-symbols-outlined aurora-star" aria-hidden="true">auto_awesome</span>
               <span class="aurora-label-text">Project Aurora</span>
             </div>
           </div>
@@ -56,8 +56,8 @@
         </div>
         <div class="access-card">
           @if (waitlistState === 'success') {
-            <div class="form-success">
-              <span class="material-symbols-outlined success-icon">check_circle</span>
+            <div class="form-success" role="status">
+              <span class="material-symbols-outlined success-icon" aria-hidden="true">check_circle</span>
               <div>
                 <p class="success-title">You're in — check your inbox!</p>
                 <p class="success-desc">We've sent you a confirmation email. We'll reach out personally when early access opens.</p>
@@ -84,16 +84,16 @@
                 <div class="form-row-2">
                   <div class="form-field">
                     <label class="field-label" for="wl-name">Name</label>
-                    <input id="wl-name" class="field-input" type="text" formControlName="name" placeholder="Design Enthusiast" autocomplete="name" [attr.aria-invalid]="wName.invalid && wName.touched" />
+                    <input id="wl-name" class="field-input" type="text" formControlName="name" placeholder="Design Enthusiast" autocomplete="name" required [attr.aria-invalid]="wName.invalid && wName.touched" [attr.aria-describedby]="wName.invalid && wName.touched ? 'wl-name-error' : null" />
                     @if (wName.invalid && wName.touched) {
-                      <span class="field-error" role="alert">Name is required</span>
+                      <span id="wl-name-error" class="field-error" role="alert">Name is required</span>
                     }
                   </div>
                   <div class="form-field">
                     <label class="field-label" for="wl-email">Email</label>
-                    <input id="wl-email" class="field-input" type="email" formControlName="email" placeholder="hello@studio.com" autocomplete="email" [attr.aria-invalid]="wEmail.invalid && wEmail.touched" />
+                    <input id="wl-email" class="field-input" type="email" formControlName="email" placeholder="hello@studio.com" autocomplete="email" required [attr.aria-invalid]="wEmail.invalid && wEmail.touched" [attr.aria-describedby]="wEmail.invalid && wEmail.touched ? 'wl-email-error' : null" />
                     @if (wEmail.invalid && wEmail.touched) {
-                      <span class="field-error" role="alert">
+                      <span id="wl-email-error" class="field-error" role="alert">
                         @if (wEmail.hasError('required')) { Email is required }
                         @else { Enter a valid email address }
                       </span>
@@ -133,13 +133,13 @@
                 @if (step() < steps.length) {
                   <button class="btn-waitlist" type="button" (click)="nextStep()">
                     Next
-                    <span class="material-symbols-outlined">arrow_forward</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                   </button>
                 } @else {
                   <button class="btn-waitlist" type="submit" [disabled]="waitlistState === 'submitting'">
                     @if (waitlistState === 'submitting') { Submitting... }
                     @else { Join Waitlist }
-                    <span class="material-symbols-outlined">
+                    <span class="material-symbols-outlined" aria-hidden="true">
                       @if (waitlistState === 'submitting') { hourglass_empty }
                       @else { arrow_forward }
                     </span>
@@ -168,8 +168,8 @@
           <div class="request-card">
             <div class="request-glow"></div>
             @if (ideaState === 'success') {
-              <div class="form-success">
-                <span class="material-symbols-outlined success-icon">check_circle</span>
+              <div class="form-success" role="status">
+                <span class="material-symbols-outlined success-icon" aria-hidden="true">check_circle</span>
                 <div>
                   <p class="success-title">Idea submitted!</p>
                   <p class="success-desc">Thanks for sharing. We read every submission.</p>
@@ -179,19 +179,19 @@
             } @else {
               <form class="request-form" [formGroup]="ideaForm" (ngSubmit)="onSubmitIdea()">
                 @if (ideaState === 'error') {
-                  <div class="form-error-banner">Something went wrong. Please try again.</div>
+                  <div class="form-error-banner" role="alert">Something went wrong. Please try again.</div>
                 }
                 <div class="form-field">
                   <div class="field-label-row">
-                    <label class="field-label">Project Description</label>
+                    <label class="field-label" for="idea-description">Project Description</label>
                     <span class="field-optional">Optional</span>
                   </div>
-                  <textarea class="field-textarea field-textarea-lg" rows="6" formControlName="description"
+                  <textarea id="idea-description" class="field-textarea field-textarea-lg" rows="6" formControlName="description"
                     placeholder="I wish there was an app that could..."></textarea>
                 </div>
                 <div class="request-footer-row">
                   <div class="anon-note">
-                    <span class="material-symbols-outlined anon-icon">lock</span>
+                    <span class="material-symbols-outlined anon-icon" aria-hidden="true">lock</span>
                     Fully anonymous submission
                   </div>
                   <button class="btn-submit" type="submit" [disabled]="ideaState === 'submitting'">
@@ -204,11 +204,11 @@
           </div>
           <div class="example-cards">
             <div class="example-card">
-              <span class="material-symbols-outlined example-icon">auto_awesome</span>
+              <span class="material-symbols-outlined example-icon" aria-hidden="true">auto_awesome</span>
               <p class="example-quote">"A workspace that organizes my moodboards based on color palette automatically..."</p>
             </div>
             <div class="example-card">
-              <span class="material-symbols-outlined example-icon">history</span>
+              <span class="material-symbols-outlined example-icon" aria-hidden="true">history</span>
               <p class="example-quote">"Version control for non-developers that feels like a simple undo button..."</p>
             </div>
           </div>
