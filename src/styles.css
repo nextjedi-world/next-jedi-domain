@@ -20,7 +20,7 @@
   --color-border: #e2e0f0;
   --color-text: #141b2b;
   --color-text-muted: #464555;
-  --color-text-light: #777587;
+  --color-text-light: #66647a; /* 5.2:1+ on all surfaces up to --color-surface-low */
   --color-success: #1a7f4b;
   --color-danger: #b3261e;
 
@@ -269,3 +269,18 @@ a {
 .wl-chips label{border:1px solid;border-radius:99px;padding:.4rem .8rem}
 .btn-back{background:0;border:0;color:inherit;text-decoration:underline;margin-right:1rem}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Accessibility: visible keyboard focus everywhere (NJACC-28) */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.field-input:focus-visible,
+.field-textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.wl-chips label:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

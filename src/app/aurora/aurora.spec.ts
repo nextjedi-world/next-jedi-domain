@@ -90,3 +90,44 @@ describe('Aurora waitlist steps', () => {
     expect(cmp.interests()).toEqual(['Developer tools']);
   });
 });
+
+describe('Aurora accessibility', () => {
+  function render() {
+    TestBed.configureTestingModule({
+      imports: [AuroraPage],
+      providers: [
+        provideRouter([]),
+        { provide: AuroraService, useValue: { submitWaitlist: vi.fn(() => of(undefined)), submitIdea: vi.fn(() => of(undefined)) } },
+      ],
+    });
+    const fixture = TestBed.createComponent(AuroraPage);
+    fixture.detectChanges();
+    return fixture;
+  }
+
+  it('labels the idea textarea and the step 1 inputs', () => {
+    const fixture = render();
+    const el: HTMLElement = fixture.nativeElement;
+    const area = el.querySelector('#idea-description');
+    expect(area).toBeTruthy();
+    expect(el.querySelector('label[for="idea-description"]')).toBeTruthy();
+    expect(el.querySelector('label[for="wl-name"]')).toBeTruthy();
+    expect(el.querySelector('label[for="wl-email"]')).toBeTruthy();
+  });
+
+  it('links invalid fields to their error message', () => {
+    const fixture = render();
+    fixture.componentInstance.nextStep();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('#wl-name')?.getAttribute('aria-describedby')).toBe('wl-name-error');
+    expect(el.querySelector('#wl-name-error')?.getAttribute('role')).toBe('alert');
+  });
+
+  it('hides decorative icons from assistive tech', () => {
+    const el: HTMLElement = render().nativeElement;
+    const icons = el.querySelectorAll('.material-symbols-outlined');
+    expect(icons.length).toBeGreaterThan(0);
+    icons.forEach((i) => expect(i.getAttribute('aria-hidden')).toBe('true'));
+  });
+});
