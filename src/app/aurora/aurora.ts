@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuroraService } from './aurora.service';
@@ -545,11 +545,25 @@ export class AuroraPage implements OnInit {
     });
   }
 
+  readonly steps = ['Email', 'Interests', 'Feature request'] as const;
+  readonly interestOptions = [
+    'Productivity apps',
+    'Games and puzzles',
+    'Health and wellness',
+    'Developer tools',
+    'Creative tools',
+  ];
+
   waitlistForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     feature: [''],
   });
+
+  step = signal(1);
+  interests = signal<string[]>([]);
+  interestsError = signal(false);
+  announcement = signal('');
 
   ideaForm = this.fb.group({
     description: [''],
@@ -562,20 +576,72 @@ export class AuroraPage implements OnInit {
   get wEmail() { return this.waitlistForm.get('email')!; }
   get wFeature() { return this.waitlistForm.get('feature')!; }
 
+  private stepValid(): boolean {
+    if (this.step() === 1) {
+      this.wName.markAsTouched();
+      this.wEmail.markAsTouched();
+      return this.wName.valid && this.wEmail.valid;
+    }
+    if (this.step() === 2) {
+      const ok = this.interests().length > 0;
+      this.interestsError.set(!ok);
+      return ok;
+    }
+    return true;
+  }
+
+  private goTo(n: number) {
+    this.step.set(n);
+    this.announcement.set(`Step ${n} of ${this.steps.length}: ${this.steps[n - 1]}`);
+  }
+
+  nextStep() {
+    if (!this.stepValid()) return;
+    if (this.step() < this.steps.length) this.goTo(this.step() + 1);
+  }
+
+  prevStep() {
+    if (this.step() > 1) this.goTo(this.step() - 1);
+  }
+
+  toggleInterest(option: string) {
+    this.interests.update((cur) =>
+      cur.includes(option) ? cur.filter((o) => o !== option) : [...cur, option],
+    );
+    if (this.interests().length > 0) this.interestsError.set(false);
+  }
+
   onJoinWaitlist() {
+    if (this.step() < this.steps.length) {
+      this.nextStep();
+      return;
+    }
     if (this.waitlistForm.invalid) {
       this.waitlistForm.markAllAsTouched();
+      this.goTo(1);
       return;
     }
     this.waitlistState = 'submitting';
     const { name, email, feature } = this.waitlistForm.value;
-    this.aurora.submitWaitlist({ name: name!, email: email!, feature: feature! }).subscribe({
-      next: () => {
-        this.waitlistState = 'success';
-        this.waitlistForm.reset();
-      },
-      error: () => { this.waitlistState = 'error'; },
-    });
+    this.aurora
+      .submitWaitlist({
+        name: name!,
+        email: email!,
+        feature: feature ?? '',
+        app: this.interests().join(', '),
+      })
+      .subscribe({
+        next: () => {
+          this.waitlistState = 'success';
+          this.waitlistForm.reset();
+          this.interests.set([]);
+          this.step.set(1);
+        },
+        // Keep all entered state so the user can retry from the last step.
+        error: () => {
+          this.waitlistState = 'error';
+        },
+      });
   }
 
   onSubmitIdea() {
