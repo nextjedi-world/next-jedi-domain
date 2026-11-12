@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { AuroraService } from '../../aurora/aurora.service';
+import { PlatformApi } from '../../core/platform-api';
+import { SubmissionController } from '../../core/submission';
+import { FormErrorComponent } from '../form-error/form-error';
 import { AppStage } from '../../apps.config';
 
 export type EarlyAccessPlatform = 'android' | 'ios';
@@ -8,7 +10,7 @@ export type EarlyAccessPlatform = 'android' | 'ios';
 @Component({
   selector: 'app-early-access-panel',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormErrorComponent],
   template: `
     <div class="panel-backdrop" (click)="closed.emit()"></div>
 
@@ -52,33 +54,40 @@ export type EarlyAccessPlatform = 'android' | 'ios';
                 We'll reach out personally when it's ready.
               </p>
 
-              @if (formState() === 'error') {
-                <div class="form-error-banner">Something went wrong — please try again.</div>
-              }
+              <app-form-error
+                [state]="submission.state()"
+                [otherErrors]="submission.otherErrors()"
+                [subject]="appName + ' ' + platformLabel + ' early access'"
+                (retry)="onSubmit()"
+              />
 
               <form class="waitlist-form" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="field">
                   <label class="field-label">Name</label>
                   <input class="field-input" type="text" formControlName="name" placeholder="Your name" />
                   @if (nameCtrl.invalid && nameCtrl.touched) {
-                    <span class="field-error">Name is required</span>
+                    <span class="field-error">{{ nameCtrl.errors?.['server'] ?? 'Name is required' }}</span>
                   }
                 </div>
                 <div class="field">
                   <label class="field-label">Email</label>
                   <input class="field-input" type="email" formControlName="email" placeholder="you@example.com" />
+                  <div class="hp-field" aria-hidden="true">
+                    <input formControlName="website" tabindex="-1" autocomplete="off" aria-label="Website" />
+                  </div>
                   @if (emailCtrl.invalid && emailCtrl.touched) {
                     <span class="field-error">
-                      @if (emailCtrl.hasError('required')) { Email is required }
+                      @if (emailCtrl.hasError('server')) { {{ emailCtrl.errors?.['server'] }} }
+                      @else if (emailCtrl.hasError('required')) { Email is required }
                       @else { Enter a valid email address }
                     </span>
                   }
                 </div>
-                <button class="btn-submit" type="submit" [disabled]="formState() === 'submitting'">
-                  @if (formState() === 'submitting') { Submitting… }
+                <button class="btn-submit" type="submit" [disabled]="submission.state() === 'submitting'">
+                  @if (submission.state() === 'submitting') { Submitting… }
                   @else { Notify Me }
                   <span class="material-symbols-outlined">
-                    {{ formState() === 'submitting' ? 'hourglass_empty' : 'notifications' }}
+                    {{ submission.state() === 'submitting' ? 'hourglass_empty' : 'notifications' }}
                   </span>
                 </button>
               </form>
@@ -124,33 +133,40 @@ export type EarlyAccessPlatform = 'android' | 'ios';
                 Leave your email and we'll add you to the {{ platformLabel }} tester list personally.
               </p>
 
-              @if (formState() === 'error') {
-                <div class="form-error-banner">Something went wrong — please try again.</div>
-              }
+              <app-form-error
+                [state]="submission.state()"
+                [otherErrors]="submission.otherErrors()"
+                [subject]="appName + ' ' + platformLabel + ' early access'"
+                (retry)="onSubmit()"
+              />
 
               <form class="waitlist-form" [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="field">
                   <label class="field-label">Name</label>
                   <input class="field-input" type="text" formControlName="name" placeholder="Your name" />
                   @if (nameCtrl.invalid && nameCtrl.touched) {
-                    <span class="field-error">Name is required</span>
+                    <span class="field-error">{{ nameCtrl.errors?.['server'] ?? 'Name is required' }}</span>
                   }
                 </div>
                 <div class="field">
                   <label class="field-label">Email</label>
                   <input class="field-input" type="email" formControlName="email" placeholder="you@example.com" />
+                  <div class="hp-field" aria-hidden="true">
+                    <input formControlName="website" tabindex="-1" autocomplete="off" aria-label="Website" />
+                  </div>
                   @if (emailCtrl.invalid && emailCtrl.touched) {
                     <span class="field-error">
-                      @if (emailCtrl.hasError('required')) { Email is required }
+                      @if (emailCtrl.hasError('server')) { {{ emailCtrl.errors?.['server'] }} }
+                      @else if (emailCtrl.hasError('required')) { Email is required }
                       @else { Enter a valid email address }
                     </span>
                   }
                 </div>
-                <button class="btn-submit" type="submit" [disabled]="formState() === 'submitting'">
-                  @if (formState() === 'submitting') { Submitting… }
+                <button class="btn-submit" type="submit" [disabled]="submission.state() === 'submitting'">
+                  @if (submission.state() === 'submitting') { Submitting… }
                   @else { Request Access }
                   <span class="material-symbols-outlined">
-                    {{ formState() === 'submitting' ? 'hourglass_empty' : 'arrow_forward' }}
+                    {{ submission.state() === 'submitting' ? 'hourglass_empty' : 'arrow_forward' }}
                   </span>
                 </button>
               </form>
@@ -515,49 +531,48 @@ export type EarlyAccessPlatform = 'android' | 'ios';
     @media (max-width: 480px) { .panel { width: 100vw; } }
   `],
 })
-export class EarlyAccessPanelComponent implements OnInit {
+export class EarlyAccessPanelComponent {
   @Input() platform: EarlyAccessPlatform = 'android';
   @Input() stage: AppStage = 'coming-soon';
   @Input() storeUrl = '';
   @Input() appName = '';
+  /** Catalog product id (the app's slug), sent as `product`. */
+  @Input() appSlug = '';
   @Input() appIcon = 'apps';
   @Output() closed = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
-  private auroraService = inject(AuroraService);
+  private api = inject(PlatformApi);
 
   state = signal<'default' | 'success'>('default');
-  formState = signal<'idle' | 'submitting' | 'error'>('idle');
 
-  form = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
+  form = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email]],
+    website: [''],
   });
+  protected readonly submission = new SubmissionController(this.form);
 
-  get nameCtrl() { return this.form.get('name')!; }
-  get emailCtrl() { return this.form.get('email')!; }
+  get nameCtrl() { return this.form.controls.name; }
+  get emailCtrl() { return this.form.controls.email; }
 
   get platformLabel() { return this.platform === 'android' ? 'Android' : 'iOS'; }
   get storeName() { return this.platform === 'android' ? 'Play Store' : 'App Store'; }
 
-  ngOnInit() {}
-
+  /** Coming soon: join the waitlist. Early access: ask to be added as a tester. */
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.formState.set('submitting');
-    const { name, email } = this.form.value;
-    const feature = this.stage === 'coming-soon'
-      ? `${this.platformLabel} waitlist`
-      : `${this.platformLabel} early access`;
-    this.auroraService.submitWaitlist({
-      name: name!,
-      email: email!,
-      app: this.appName,
-      platform: this.platformLabel,
-      feature,
-    }).subscribe({
-      next: () => { this.state.set('success'); },
-      error: () => { this.formState.set('error'); },
-    });
+    const { name, email, website } = this.form.getRawValue();
+    this.submission.run(
+      this.api.submit({
+        kind: this.stage === 'coming-soon' ? 'waitlist' : 'tester',
+        ...(this.appSlug ? { product: this.appSlug } : {}),
+        platform: this.platform,
+        name: name.trim(),
+        email: email.trim(),
+        website,
+      }),
+      () => this.state.set('success'),
+    );
   }
 }

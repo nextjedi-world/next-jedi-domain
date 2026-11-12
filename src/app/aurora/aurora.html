@@ -11,6 +11,11 @@
         <span class="nav-sep">/</span>
         <span class="nav-app-name">Project Aurora</span>
       </div>
+      <nav class="nav-global-links">
+        <a class="nav-global-link" routerLink="/ideas">Ideas</a>
+        <a class="nav-global-link" routerLink="/team">Meet the Team</a>
+      </nav>
+      <app-user-menu />
     </div>
   </header>
 
@@ -55,7 +60,7 @@
           <p class="access-sub">Be the first to experience the future of creative collaboration.</p>
         </div>
         <div class="access-card">
-          @if (waitlistState === 'success') {
+          @if (waitlist.state() === 'success') {
             <div class="form-success">
               <span class="material-symbols-outlined success-icon">check_circle</span>
               <div>
@@ -65,23 +70,27 @@
             </div>
           } @else {
             <form class="access-form" [formGroup]="waitlistForm" (ngSubmit)="onJoinWaitlist()">
-              @if (waitlistState === 'error') {
-                <div class="form-error-banner">Something went wrong. Please try again.</div>
-              }
+              <app-form-error
+                [state]="waitlist.state()"
+                [otherErrors]="waitlist.otherErrors()"
+                subject="Project Aurora waitlist"
+                (retry)="onJoinWaitlist()"
+              />
               <div class="form-row-2">
                 <div class="form-field">
-                  <label class="field-label">Name</label>
-                  <input class="field-input" type="text" formControlName="name" placeholder="Design Enthusiast" />
+                  <label class="field-label" for="aw-name">Name</label>
+                  <input id="aw-name" class="field-input" type="text" formControlName="name" autocomplete="name" placeholder="Design Enthusiast" />
                   @if (wName.invalid && wName.touched) {
-                    <span class="field-error">Name is required</span>
+                    <span class="field-error">{{ wName.errors?.['server'] ?? 'Name is required' }}</span>
                   }
                 </div>
                 <div class="form-field">
-                  <label class="field-label">Email</label>
-                  <input class="field-input" type="email" formControlName="email" placeholder="hello@studio.com" />
+                  <label class="field-label" for="aw-email">Email</label>
+                  <input id="aw-email" class="field-input" type="email" formControlName="email" autocomplete="email" placeholder="hello@studio.com" />
                   @if (wEmail.invalid && wEmail.touched) {
                     <span class="field-error">
-                      @if (wEmail.hasError('required')) { Email is required }
+                      @if (wEmail.hasError('server')) { {{ wEmail.errors?.['server'] }} }
+                      @else if (wEmail.hasError('required')) { Email is required }
                       @else { Enter a valid email address }
                     </span>
                   }
@@ -89,17 +98,24 @@
               </div>
               <div class="form-field">
                 <div class="field-label-row">
-                  <label class="field-label">What feature would you like to see most?</label>
+                  <label class="field-label" for="aw-feature">What feature would you like to see most?</label>
                   <span class="field-optional">Optional</span>
                 </div>
-                <textarea class="field-textarea" rows="3" formControlName="feature" placeholder="Describe your dream feature..."></textarea>
+                <textarea id="aw-feature" class="field-textarea" rows="3" formControlName="feature" placeholder="Describe your dream feature..."></textarea>
+                @if (wFeature.hasError('server')) {
+                  <span class="field-error">{{ wFeature.errors?.['server'] }}</span>
+                }
+              </div>
+              <div class="hp-field" aria-hidden="true">
+                <label for="aw-website">Website</label>
+                <input id="aw-website" formControlName="website" tabindex="-1" autocomplete="off" />
               </div>
               <div class="form-actions">
-                <button class="btn-waitlist" type="submit" [disabled]="waitlistState === 'submitting'">
-                  @if (waitlistState === 'submitting') { Submitting... }
+                <button class="btn-waitlist" type="submit" [disabled]="waitlist.state() === 'submitting'">
+                  @if (waitlist.state() === 'submitting') { Submitting... }
                   @else { Join Waitlist }
                   <span class="material-symbols-outlined">
-                    @if (waitlistState === 'submitting') { hourglass_empty }
+                    @if (waitlist.state() === 'submitting') { hourglass_empty }
                     @else { arrow_forward }
                   </span>
                 </button>
@@ -125,35 +141,44 @@
         <div class="requests-right">
           <div class="request-card">
             <div class="request-glow"></div>
-            @if (ideaState === 'success') {
+            @if (idea.state() === 'success') {
               <div class="form-success">
                 <span class="material-symbols-outlined success-icon">check_circle</span>
                 <div>
                   <p class="success-title">Idea submitted!</p>
                   <p class="success-desc">Thanks for sharing. We read every submission.</p>
-                  <button class="btn-reset" (click)="resetIdea()">Submit another idea</button>
+                  <button type="button" class="btn-reset" (click)="resetIdea()">Submit another idea</button>
                 </div>
               </div>
             } @else {
               <form class="request-form" [formGroup]="ideaForm" (ngSubmit)="onSubmitIdea()">
-                @if (ideaState === 'error') {
-                  <div class="form-error-banner">Something went wrong. Please try again.</div>
-                }
+                <app-form-error
+                  [state]="idea.state()"
+                  [otherErrors]="idea.otherErrors()"
+                  subject="Project Aurora idea"
+                  (retry)="onSubmitIdea()"
+                />
                 <div class="form-field">
                   <div class="field-label-row">
-                    <label class="field-label">Project Description</label>
-                    <span class="field-optional">Optional</span>
+                    <label class="field-label" for="ai-description">Project Description</label>
                   </div>
-                  <textarea class="field-textarea field-textarea-lg" rows="6" formControlName="description"
+                  <textarea id="ai-description" class="field-textarea field-textarea-lg" rows="6" formControlName="description"
                     placeholder="I wish there was an app that could..."></textarea>
+                  @if (iDescription.invalid && iDescription.touched) {
+                    <span class="field-error">{{ iDescription.errors?.['server'] ?? 'Tell us a little about the idea (10 characters or more)' }}</span>
+                  }
+                </div>
+                <div class="hp-field" aria-hidden="true">
+                  <label for="ai-website">Website</label>
+                  <input id="ai-website" formControlName="website" tabindex="-1" autocomplete="off" />
                 </div>
                 <div class="request-footer-row">
                   <div class="anon-note">
                     <span class="material-symbols-outlined anon-icon">lock</span>
                     Fully anonymous submission
                   </div>
-                  <button class="btn-submit" type="submit" [disabled]="ideaState === 'submitting'">
-                    @if (ideaState === 'submitting') { Submitting... }
+                  <button class="btn-submit" type="submit" [disabled]="idea.state() === 'submitting'">
+                    @if (idea.state() === 'submitting') { Submitting... }
                     @else { Submit Idea }
                   </button>
                 </div>

@@ -14,6 +14,7 @@
         <a class="nav-global-link" [class.active]="activeSection === 'how-it-works'" href="#how-it-works" (click)="scrollToSection('how-it-works', $event)">How It Works</a>
         <a class="nav-global-link" [class.active]="activeSection === 'dashboard'" href="#dashboard" (click)="scrollToSection('dashboard', $event)">Dashboard</a>
       </nav>
+      <app-user-menu />
     </div>
   </header>
 
@@ -160,6 +161,7 @@
       [stage]="app.android.stage"
       [storeUrl]="app.android.storeUrl ?? ''"
       [appName]="app.name"
+      [appSlug]="app.slug"
       [appIcon]="app.icon"
       (closed)="showAndroidPanel = false"
     />
@@ -170,6 +172,7 @@
       [stage]="app.ios.stage"
       [storeUrl]="app.ios.storeUrl ?? ''"
       [appName]="app.name"
+      [appSlug]="app.slug"
       [appIcon]="app.icon"
       (closed)="showIosPanel = false"
     />

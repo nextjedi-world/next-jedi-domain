@@ -1,0 +1,77 @@
+<div class="detail-page">
+  <app-site-header pageName="Ideas" pageLink="/ideas" />
+
+  <main class="detail-main" aria-live="polite">
+    <div class="detail-inner">
+      <a class="back-link" routerLink="/ideas">
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> All ideas
+      </a>
+
+      @switch (state()) {
+        @case ('loading') {
+          <div class="detail-grid" aria-busy="true" aria-label="Loading">
+            <div class="sk-col">
+              <div class="sk sk-icon"></div>
+              <div class="sk sk-title"></div>
+              <div class="sk sk-line"></div>
+              <div class="sk sk-line short"></div>
+            </div>
+            <div class="sk sk-card"></div>
+          </div>
+        }
+        @case ('not_found') {
+          <div class="state-box">
+            <span class="material-symbols-outlined state-icon">search_off</span>
+            <h1 class="state-title">We couldn't find that idea</h1>
+            <p class="state-sub">It may have been renamed or retired.</p>
+            <a class="btn-primary" routerLink="/ideas">See all ideas</a>
+          </div>
+        }
+        @case ('error') {
+          <div class="state-box" role="alert">
+            <span class="material-symbols-outlined state-icon">cloud_off</span>
+            <h1 class="state-title">We couldn't load this idea</h1>
+            <p class="state-sub">This is on our side. Please try again in a moment.</p>
+            <button type="button" class="btn-primary" (click)="load()">Try again</button>
+          </div>
+        }
+        @default {
+          @if (product(); as p) {
+            <div class="detail-grid">
+              <section class="detail-info">
+                <div class="info-top">
+                  @if (p.imageUrl) {
+                    <img class="info-img" [src]="p.imageUrl" [alt]="p.name + ' icon'" />
+                  } @else {
+                    <span class="info-letter" aria-hidden="true">{{ p.name.charAt(0) }}</span>
+                  }
+                  <app-status-badge [status]="p.status" />
+                </div>
+                <h1 class="info-name">{{ p.name }}</h1>
+                <p class="info-tagline">{{ p.tagline }}</p>
+                <p class="info-summary">{{ p.summary }}</p>
+                @if (p.platforms.length) {
+                  <p class="info-platforms">
+                    <span class="info-label">Platforms</span>
+                    @for (pl of p.platforms; track pl) {
+                      <span class="chip">{{ platformLabels[pl] || pl }}</span>
+                    }
+                  </p>
+                }
+                @if (p.url) {
+                  <a class="info-link" [routerLink]="p.url">
+                    Visit the {{ p.name }} page
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                  </a>
+                }
+              </section>
+              <app-early-adopter-card [product]="p" (reserved)="onReserved()" />
+            </div>
+          }
+        }
+      }
+    </div>
+  </main>
+
+  <app-footer />
+</div>

@@ -258,3 +258,15 @@ a {
   color: var(--color-text-light);
   letter-spacing: 0.02em;
 }
+
+/* ============================================================
+   Form honeypot: hidden from people and screen readers; bots fill it.
+   platform-api returns 201 and stores nothing when `website` is set.
+   ============================================================ */
+.hp-field {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

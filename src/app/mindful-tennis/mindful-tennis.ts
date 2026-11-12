@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { UserMenuComponent } from '../shared/user-menu/user-menu';
 import { RouterLink } from '@angular/router';
 import { APPS } from '../apps.config';
 import { EarlyAccessPanelComponent } from '../shared/download-panel/download-panel';
@@ -7,7 +8,7 @@ import { SeoService, SITE_URL } from '../seo.service';
 
 @Component({
   selector: 'app-mindful-tennis',
-  imports: [RouterLink, EarlyAccessPanelComponent, FooterComponent],
+  imports: [RouterLink, EarlyAccessPanelComponent, FooterComponent, UserMenuComponent],
   templateUrl: './mindful-tennis.html',
   styles: [`
     .mt-page {

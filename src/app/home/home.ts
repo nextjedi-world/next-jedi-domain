@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { UserMenuComponent } from '../shared/user-menu/user-menu';
 import { RouterLink } from '@angular/router';
 import { APPS } from '../apps.config';
 import { SeoService } from '../seo.service';
@@ -6,7 +7,7 @@ import { FooterComponent } from '../shared/footer/footer';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FooterComponent],
+  imports: [RouterLink, FooterComponent, UserMenuComponent],
   templateUrl: './home.html',
   styles: [
     `
@@ -267,6 +268,44 @@ import { FooterComponent } from '../shared/footer/footer';
         transition: color 0.15s;
       }
       .home-nav-link:hover { color: var(--color-primary); }
+      @media (max-width: 640px) {
+        .home-nav-links { gap: 16px; }
+        .home-nav-link:not(.keep) { display: none; }
+      }
+
+      /* ---- Ideas band ---- */
+      .ideas-band { padding: 0 32px 96px; }
+      .ideas-band-inner {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        background: var(--color-primary);
+        color: #fff;
+        border-radius: var(--radius-xl);
+        padding: 40px 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .ideas-band-eyebrow {
+        font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.14em; color: var(--color-primary-light);
+      }
+      .ideas-band-title {
+        font-family: var(--font-headline); font-size: 1.8rem; font-weight: 800;
+        letter-spacing: -0.02em; margin: 6px 0;
+      }
+      .ideas-band-sub { color: var(--color-primary-light); }
+      .ideas-band-cta {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 14px 28px; border-radius: var(--radius-full);
+        background: #fff; color: var(--color-primary); font-weight: 700; white-space: nowrap;
+      }
+      @media (max-width: 560px) {
+        .ideas-band { padding: 0 16px 64px; }
+        .ideas-band-inner { padding: 28px 24px; }
+      }
 
       /* ---- Animations ---- */
       @keyframes pulse-green {

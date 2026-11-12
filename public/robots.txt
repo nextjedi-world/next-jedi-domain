@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /account
+Disallow: /auth/
+Disallow: /sign-in
 
 Sitemap: https://nextjedi.com/sitemap.xml

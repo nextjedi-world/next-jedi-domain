@@ -1,4 +1,4 @@
-# Conventional PR title (it becomes the squash commit release-please reads) and a Linear reference.
+# Conventional PR title (it becomes the squash commit release-please reads) and an issue reference (any Linear or Plane key).
 # Inlined from nextjedi-world/platform commitlint.yml because that repo is private.
 name: commitlint
 
@@ -33,5 +33,5 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          printf '%s\n' "$PR_BODY" | grep -Eiq "(fixes|closes|resolves|refs|part of)[[:space:]:]+NEX-[0-9]+" \
-            || { echo "::error title=Linear reference::Add a line like 'Fixes NEX-123' to the PR body."; exit 1; }
+          printf '%s\n' "$PR_BODY" | grep -Eiq "(fixes|closes|resolves|refs|part of)[[:space:]:]+[A-Z][A-Z0-9]{1,9}-[0-9]+" \
+            || { echo "::error title=Issue reference::Add a line like 'Fixes NEX-123' or 'Fixes NJACC-62' to the PR body."; exit 1; }
