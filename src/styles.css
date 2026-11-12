@@ -21,6 +21,8 @@
   --color-text: #141b2b;
   --color-text-muted: #464555;
   --color-text-light: #777587;
+  --color-success: #1a7f4b;
+  --color-danger: #b3261e;
 
   --radius-xs: 6px;
   --radius-sm: 10px;
