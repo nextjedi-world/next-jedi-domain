@@ -24,11 +24,12 @@ describe('vercel.json security headers', () => {
   });
 
   it('allows the origins the site needs', () => {
-    expect(directive('script-src')).toContain('https://checkout.razorpay.com');
-    expect(directive('frame-src')).toContain('https://checkout.razorpay.com');
-    expect(directive('frame-src')).toContain('https://api.razorpay.com');
+    // Sign-in (OIDC discovery, token, JWKS) and platform-api calls from the browser.
+    expect(directive('connect-src')).toContain('https://auth.nextjedi.com');
     expect(directive('connect-src')).toContain('https://api.nextjedi.com');
-    expect(directive('connect-src')).toContain('supabase.co');
+    // Payments are not wired yet; add the PayU hosts here when checkout ships (NJACC-66).
+    expect(csp).not.toContain('razorpay');
+    expect(csp).not.toContain('supabase');
     expect(directive('style-src')).toContain('https://fonts.googleapis.com');
     expect(directive('font-src')).toContain('https://fonts.gstatic.com');
     expect(directive('frame-ancestors')).toBe("frame-ancestors 'none'");
