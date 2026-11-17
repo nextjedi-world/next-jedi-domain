@@ -4,7 +4,7 @@
   <header class="site-nav">
     <div class="nav-inner">
       <a class="nav-brand" routerLink="/">
-        <span class="material-symbols-outlined brand-icon">grid_view</span>
+        <span class="material-symbols-outlined brand-icon" aria-hidden="true">grid_view</span>
         <span class="brand-name">Next Jedi</span>
       </a>
       <div class="nav-app">
@@ -26,7 +26,7 @@
       <div class="hero-grid">
         <div class="hero-left">
           <div class="coming-badge">
-            <span class="material-symbols-outlined badge-icon">schedule</span>
+            <span class="material-symbols-outlined badge-icon" aria-hidden="true">schedule</span>
             Coming Early 2026
           </div>
           <h1 class="aurora-title">
@@ -42,7 +42,7 @@
             <div class="aurora-layer layer-2"></div>
             <div class="aurora-layer layer-3"></div>
             <div class="aurora-label-wrap">
-              <span class="material-symbols-outlined aurora-star">auto_awesome</span>
+              <span class="material-symbols-outlined aurora-star" aria-hidden="true">auto_awesome</span>
               <span class="aurora-label-text">Project Aurora</span>
             </div>
           </div>
@@ -61,8 +61,8 @@
         </div>
         <div class="access-card">
           @if (waitlist.state() === 'success') {
-            <div class="form-success">
-              <span class="material-symbols-outlined success-icon">check_circle</span>
+            <div class="form-success" role="status">
+              <span class="material-symbols-outlined success-icon" aria-hidden="true">check_circle</span>
               <div>
                 <p class="success-title">You're in — check your inbox!</p>
                 <p class="success-desc">We've sent you a confirmation email. We'll reach out personally when early access opens.</p>
@@ -76,49 +76,91 @@
                 subject="Project Aurora waitlist"
                 (retry)="onJoinWaitlist()"
               />
-              <div class="form-row-2">
-                <div class="form-field">
-                  <label class="field-label" for="aw-name">Name</label>
-                  <input id="aw-name" class="field-input" type="text" formControlName="name" autocomplete="name" placeholder="Design Enthusiast" />
-                  @if (wName.invalid && wName.touched) {
-                    <span class="field-error">{{ wName.errors?.['server'] ?? 'Name is required' }}</span>
-                  }
-                </div>
-                <div class="form-field">
-                  <label class="field-label" for="aw-email">Email</label>
-                  <input id="aw-email" class="field-input" type="email" formControlName="email" autocomplete="email" placeholder="hello@studio.com" />
-                  @if (wEmail.invalid && wEmail.touched) {
-                    <span class="field-error">
-                      @if (wEmail.hasError('server')) { {{ wEmail.errors?.['server'] }} }
-                      @else if (wEmail.hasError('required')) { Email is required }
-                      @else { Enter a valid email address }
-                    </span>
-                  }
-                </div>
-              </div>
-              <div class="form-field">
-                <div class="field-label-row">
-                  <label class="field-label" for="aw-feature">What feature would you like to see most?</label>
-                  <span class="field-optional">Optional</span>
-                </div>
-                <textarea id="aw-feature" class="field-textarea" rows="3" formControlName="feature" placeholder="Describe your dream feature..."></textarea>
-                @if (wFeature.hasError('server')) {
-                  <span class="field-error">{{ wFeature.errors?.['server'] }}</span>
+              <p class="sr-only" aria-live="polite" role="status">{{ announcement() }}</p>
+              <ol class="wl-progress" aria-label="Progress">
+                @for (label of steps; track label; let i = $index) {
+                  <li
+                    [class.current]="step() === i + 1"
+                    [class.done]="step() > i + 1"
+                    [attr.aria-current]="step() === i + 1 ? 'step' : null"
+                  >
+                    Step {{ i + 1 }} of {{ steps.length }}: {{ label }}
+                  </li>
                 }
-              </div>
+              </ol>
+              @if (step() === 1) {
+                <div class="form-row-2">
+                  <div class="form-field">
+                    <label class="field-label" for="wl-name">Name</label>
+                    <input id="wl-name" class="field-input" type="text" formControlName="name" placeholder="Design Enthusiast" autocomplete="name" required [attr.aria-invalid]="wName.invalid && wName.touched" [attr.aria-describedby]="wName.invalid && wName.touched ? 'wl-name-error' : null" />
+                    @if (wName.invalid && wName.touched) {
+                      <span id="wl-name-error" class="field-error" role="alert">{{ wName.errors?.['server'] ?? 'Name is required' }}</span>
+                    }
+                  </div>
+                  <div class="form-field">
+                    <label class="field-label" for="wl-email">Email</label>
+                    <input id="wl-email" class="field-input" type="email" formControlName="email" placeholder="hello@studio.com" autocomplete="email" required [attr.aria-invalid]="wEmail.invalid && wEmail.touched" [attr.aria-describedby]="wEmail.invalid && wEmail.touched ? 'wl-email-error' : null" />
+                    @if (wEmail.invalid && wEmail.touched) {
+                      <span id="wl-email-error" class="field-error" role="alert">
+                        @if (wEmail.hasError('server')) { {{ wEmail.errors?.['server'] }} }
+                        @else if (wEmail.hasError('required')) { Email is required }
+                        @else { Enter a valid email address }
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+              @if (step() === 2) {
+                <div class="form-field">
+                  <fieldset class="wl-chips">
+                    <legend class="field-label">Which apps or areas interest you?</legend>
+                    @for (opt of interestOptions; track opt) {
+                      <label>
+                        <input type="checkbox" [checked]="interests().includes(opt)" (change)="toggleInterest(opt)" />
+                        {{ opt }}
+                      </label>
+                    }
+                  </fieldset>
+                  @if (interestsError()) {
+                    <span class="field-error" role="alert">Pick at least one</span>
+                  }
+                </div>
+              }
+              @if (step() === 3) {
+                <div class="form-field">
+                  <div class="field-label-row">
+                    <label class="field-label" for="wl-feature">What feature would you like to see most?</label>
+                    <span class="field-optional">Optional</span>
+                  </div>
+                  <textarea id="wl-feature" class="field-textarea" rows="3" formControlName="feature" placeholder="Describe your dream feature..."></textarea>
+                  @if (wFeature.hasError('server')) {
+                    <span class="field-error" role="alert">{{ wFeature.errors?.['server'] }}</span>
+                  }
+                </div>
+              }
               <div class="hp-field" aria-hidden="true">
                 <label for="aw-website">Website</label>
                 <input id="aw-website" formControlName="website" tabindex="-1" autocomplete="off" />
               </div>
               <div class="form-actions">
-                <button class="btn-waitlist" type="submit" [disabled]="waitlist.state() === 'submitting'">
-                  @if (waitlist.state() === 'submitting') { Submitting... }
-                  @else { Join Waitlist }
-                  <span class="material-symbols-outlined">
-                    @if (waitlist.state() === 'submitting') { hourglass_empty }
-                    @else { arrow_forward }
-                  </span>
-                </button>
+                @if (step() > 1) {
+                  <button class="btn-back" type="button" (click)="prevStep()">Back</button>
+                }
+                @if (step() < steps.length) {
+                  <button class="btn-waitlist" type="button" (click)="nextStep()">
+                    Next
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                  </button>
+                } @else {
+                  <button class="btn-waitlist" type="submit" [disabled]="waitlist.state() === 'submitting'">
+                    @if (waitlist.state() === 'submitting') { Submitting... }
+                    @else { Join Waitlist }
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                      @if (waitlist.state() === 'submitting') { hourglass_empty }
+                      @else { arrow_forward }
+                    </span>
+                  </button>
+                }
               </div>
             </form>
           }
@@ -142,8 +184,8 @@
           <div class="request-card">
             <div class="request-glow"></div>
             @if (idea.state() === 'success') {
-              <div class="form-success">
-                <span class="material-symbols-outlined success-icon">check_circle</span>
+              <div class="form-success" role="status">
+                <span class="material-symbols-outlined success-icon" aria-hidden="true">check_circle</span>
                 <div>
                   <p class="success-title">Idea submitted!</p>
                   <p class="success-desc">Thanks for sharing. We read every submission.</p>
@@ -160,12 +202,12 @@
                 />
                 <div class="form-field">
                   <div class="field-label-row">
-                    <label class="field-label" for="ai-description">Project Description</label>
+                    <label class="field-label" for="idea-description">Project Description</label>
                   </div>
-                  <textarea id="ai-description" class="field-textarea field-textarea-lg" rows="6" formControlName="description"
+                  <textarea id="idea-description" class="field-textarea field-textarea-lg" rows="6" formControlName="description"
                     placeholder="I wish there was an app that could..."></textarea>
                   @if (iDescription.invalid && iDescription.touched) {
-                    <span class="field-error">{{ iDescription.errors?.['server'] ?? 'Tell us a little about the idea (10 characters or more)' }}</span>
+                    <span class="field-error" role="alert">{{ iDescription.errors?.['server'] ?? 'Tell us a little about the idea (10 characters or more)' }}</span>
                   }
                 </div>
                 <div class="hp-field" aria-hidden="true">
@@ -174,7 +216,7 @@
                 </div>
                 <div class="request-footer-row">
                   <div class="anon-note">
-                    <span class="material-symbols-outlined anon-icon">lock</span>
+                    <span class="material-symbols-outlined anon-icon" aria-hidden="true">lock</span>
                     Fully anonymous submission
                   </div>
                   <button class="btn-submit" type="submit" [disabled]="idea.state() === 'submitting'">
@@ -187,11 +229,11 @@
           </div>
           <div class="example-cards">
             <div class="example-card">
-              <span class="material-symbols-outlined example-icon">auto_awesome</span>
+              <span class="material-symbols-outlined example-icon" aria-hidden="true">auto_awesome</span>
               <p class="example-quote">"A workspace that organizes my moodboards based on color palette automatically..."</p>
             </div>
             <div class="example-card">
-              <span class="material-symbols-outlined example-icon">history</span>
+              <span class="material-symbols-outlined example-icon" aria-hidden="true">history</span>
               <p class="example-quote">"Version control for non-developers that feels like a simple undo button..."</p>
             </div>
           </div>

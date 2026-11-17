@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { PlatformApi } from '../core/platform-api';
@@ -548,12 +548,26 @@ export class AuroraPage implements OnInit {
     });
   }
 
+  readonly steps = ['Email', 'Interests', 'Feature request'] as const;
+  readonly interestOptions = [
+    'Productivity apps',
+    'Games and puzzles',
+    'Health and wellness',
+    'Developer tools',
+    'Creative tools',
+  ];
+
   waitlistForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email]],
     feature: ['', [Validators.maxLength(5000)]],
     website: [''],
   });
+
+  step = signal(1);
+  interests = signal<string[]>([]);
+  interestsError = signal(false);
+  announcement = signal('');
 
   ideaForm = this.fb.nonNullable.group({
     description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(5000)]],
@@ -563,18 +577,72 @@ export class AuroraPage implements OnInit {
   protected readonly waitlist = new SubmissionController(this.waitlistForm);
   protected readonly idea = new SubmissionController(this.ideaForm);
 
+  constructor() {
+    // The server can reject name or email while the person is on a later step: go back to them.
+    effect(() => {
+      if (this.waitlist.state() === 'invalid' && (this.wName.hasError('server') || this.wEmail.hasError('server'))) {
+        this.goTo(1);
+      }
+    });
+  }
+
   get wName() { return this.waitlistForm.controls.name; }
   get wEmail() { return this.waitlistForm.controls.email; }
   get wFeature() { return this.waitlistForm.controls.feature; }
   get iDescription() { return this.ideaForm.controls.description; }
 
+  private stepValid(): boolean {
+    if (this.step() === 1) {
+      this.wName.markAsTouched();
+      this.wEmail.markAsTouched();
+      return this.wName.valid && this.wEmail.valid;
+    }
+    if (this.step() === 2) {
+      const ok = this.interests().length > 0;
+      this.interestsError.set(!ok);
+      return ok;
+    }
+    return true;
+  }
+
+  private goTo(n: number) {
+    this.step.set(n);
+    this.announcement.set(`Step ${n} of ${this.steps.length}: ${this.steps[n - 1]}`);
+  }
+
+  nextStep() {
+    if (!this.stepValid()) return;
+    if (this.step() < this.steps.length) this.goTo(this.step() + 1);
+  }
+
+  prevStep() {
+    if (this.step() > 1) this.goTo(this.step() - 1);
+  }
+
+  toggleInterest(option: string) {
+    this.interests.update((cur) =>
+      cur.includes(option) ? cur.filter((o) => o !== option) : [...cur, option],
+    );
+    if (this.interests().length > 0) this.interestsError.set(false);
+  }
+
   onJoinWaitlist() {
+    if (this.step() < this.steps.length) {
+      this.nextStep();
+      return;
+    }
     if (this.waitlistForm.invalid) {
       this.waitlistForm.markAllAsTouched();
+      this.goTo(1);
       return;
     }
     const { name, email, feature, website } = this.waitlistForm.getRawValue();
-    const message = feature.trim();
+    const picked = this.interests();
+    const note = feature.trim();
+    // platform-api has one free-text field, so the chosen interests ride along in the message.
+    const message = [picked.length ? `Interested in: ${picked.join(', ')}` : '', note]
+      .filter(Boolean)
+      .join('\n\n');
     this.waitlist.run(
       this.api.submit({
         kind: 'waitlist',
@@ -583,7 +651,11 @@ export class AuroraPage implements OnInit {
         website,
         ...(message ? { message } : {}),
       }),
-      () => this.waitlistForm.reset(),
+      () => {
+        this.waitlistForm.reset();
+        this.interests.set([]);
+        this.step.set(1);
+      },
     );
   }
 

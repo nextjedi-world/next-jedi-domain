@@ -136,6 +136,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
+            "include": ["src/**/*.spec.ts", "api/**/*.spec.ts"],
             "runner": "vitest",
             "buildTarget": "::development"
           }

@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
       <div class="footer-inner">
         <div class="footer-brand-row">
           <a class="footer-brand" routerLink="/">
-            <span class="material-symbols-outlined footer-brand-icon">grid_view</span>
+            <span class="material-symbols-outlined footer-brand-icon" aria-hidden="true">grid_view</span>
             <span class="footer-brand-name">Next Jedi</span>
           </a>
           @if (appName()) {

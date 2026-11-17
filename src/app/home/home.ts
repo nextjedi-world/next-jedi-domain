@@ -3,11 +3,13 @@ import { UserMenuComponent } from '../shared/user-menu/user-menu';
 import { RouterLink } from '@angular/router';
 import { APPS } from '../apps.config';
 import { SeoService } from '../seo.service';
+import { NjReveal } from '../shared/reveal/reveal';
+import { NjSkeleton } from '../shared/skeleton/skeleton';
 import { FooterComponent } from '../shared/footer/footer';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FooterComponent, UserMenuComponent],
+  imports: [RouterLink, FooterComponent, UserMenuComponent, NjReveal, NjSkeleton],
   templateUrl: './home.html',
   styles: [
     `
