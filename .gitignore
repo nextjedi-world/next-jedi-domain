@@ -53,3 +53,6 @@ Thumbs.db
 
 # Local browser-automation output
 .playwright-mcp/
+
+# Local screenshots and other PR evidence
+/evidence/

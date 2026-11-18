@@ -7,15 +7,15 @@ Studio Platform (`nextjedi-world/platform`).
 
 ## Commands
 
-| Task                                | Command                                                                           |
-| ----------------------------------- | --------------------------------------------------------------------------------- |
-| Install deps and git hooks          | `make setup`                                                                      |
-| Run locally (http://localhost:4200) | `make dev`                                                                        |
-| Everything CI checks                | `make verify`                                                                     |
-| Lint / format / typecheck           | `make lint`, `make format`, `make typecheck`                                      |
-| Unit tests (vitest via `ng test`)   | `make test`, or `npx ng test --watch=false --include src/app/seo.service.spec.ts` |
-| Production build                    | `make build` (output `dist/nextjedi-app-portfolio/browser`)                       |
-| Smoke test a deployed build         | `make e2e BASE_URL=https://<preview>.vercel.app`                                  |
+| Task                                | Command                                                                                  |
+| ----------------------------------- | ---------------------------------------------------------------------------------------- |
+| Install deps and git hooks          | `make setup`                                                                             |
+| Run locally (http://localhost:4200) | `make dev` (real Identity :4000 + platform-api :4100), `make dev-mock` (in-browser mock) |
+| Everything CI checks                | `make verify`                                                                            |
+| Lint / format / typecheck           | `make lint`, `make format`, `make typecheck`                                             |
+| Unit tests (vitest via `ng test`)   | `make test`, or `npx ng test --watch=false --include src/app/seo.service.spec.ts`        |
+| Production build                    | `make build` (output `dist/nextjedi-app-portfolio/browser`)                              |
+| Smoke test a deployed build         | `make e2e BASE_URL=https://<preview>.vercel.app`                                         |
 
 `make verify` = eslint + prettier check + `tsc` (app and spec) + unit tests + production build. It is
 what CI and the Stop hook run. Do not finish a task while it fails. Node 22 (`.nvmrc`).
@@ -27,6 +27,13 @@ what CI and the Stop hook run. Do not finish a task while it fails. Node 22 (`.n
   `/privacy-policy`, `/support`, `/marketing` sub-pages from `apps.config.ts`.
 - `src/app/shared/`: reusable page templates; `shared/content/*.content.ts` holds the legal,
   privacy, support, marketing and delete-account copy per app.
+- `src/app/core/`: platform-api client (`platform-api.ts`), form submission state (`submission.ts`),
+  sign-in (`auth/`: `AuthService` signals, OIDC Code + PKCE via `angular-auth-oidc-client`, guard,
+  Bearer interceptor for platform-api only) and the dev mock (`mock/`). URLs come from
+  `src/environments/` (`NJ_CONFIG`): local contract URLs by default, `environment.mock.ts` for
+  `make dev-mock`, `environment.prod.ts` for production builds.
+- `src/app/ideas/`, `src/app/account/`, `src/app/auth/`: /ideas, /ideas/:slug, /account, /sign-in,
+  /auth/callback. All forms post to `POST /v1/submissions` (no Apps Script).
 - `src/app/observability/`: structured `log` and the Sentry init (off unless `SENTRY_DSN` is set).
 - `scripts/`: `build.mjs` (build with env baked in), `smoke.mjs` (`make e2e`), `install-hooks.mjs`.
 - `vercel.json`: SPA rewrite and output directory. Do not change Vercel project settings or DNS
@@ -46,7 +53,9 @@ what CI and the Stop hook run. Do not finish a task while it fails. Node 22 (`.n
 - Never commit secrets. Names of env vars live in `.env.example`; values live in Vercel.
 - Errors: `SENTRY_DSN` (build-time) turns Sentry on; unset is a no-op. Log with `log.*` from
   `src/app/observability/logger.ts`, not bare `console`.
-- Login, payments and the AWS API are tracked in Linear (NEX-66..93), not wired in this repo yet.
+- Sign-in (NextJedi Identity) and platform-api are wired; payments are not (Phase 2). Dev mock test
+  hooks: an email containing `ratelimit`, `servererror` or `invalid` forces 429/500/400;
+  `?mockCatalog=empty|error` does the same for the catalog.
 
 ## CI
 

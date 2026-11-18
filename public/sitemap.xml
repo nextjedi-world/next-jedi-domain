@@ -18,6 +18,48 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Ideas and founder spots (NJACC-62). One idea page per catalog product. -->
+  <url>
+    <loc>https://nextjedi.com/ideas</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/karagre</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/mindful-journal</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/mindful-tennis</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/sudoku</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/life-mathematics</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/flowtimer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nextjedi.com/ideas/pomo-timer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <!-- Company legal -->
   <url>
     <loc>https://nextjedi.com/privacy</loc>

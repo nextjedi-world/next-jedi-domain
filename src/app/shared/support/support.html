@@ -15,9 +15,11 @@
         <span class="nav-page-name">Support</span>
       </div>
       <nav class="nav-global-links">
+        <a class="nav-global-link" routerLink="/ideas">Ideas</a>
         <a class="nav-global-link" routerLink="/aurora">Project Aurora</a>
         <a class="nav-global-link" routerLink="/team">Meet the Team</a>
       </nav>
+      <app-user-menu />
     </div>
   </header>
 
@@ -62,6 +64,7 @@
               <label class="form-label" for="cf-email">Email address</label>
               <input id="cf-email" class="form-control" type="email" formControlName="email"
                      placeholder="jane@example.com" autocomplete="email" />
+              @if (fieldError('email'); as e) { <span class="field-error">{{ e }}</span> }
             </div>
 
             <div class="form-group">
@@ -72,10 +75,10 @@
                   {{ app.name }}
                 </div>
               } @else {
-                <select id="cf-app" class="form-control" formControlName="app">
+                <select id="cf-app" class="form-control" formControlName="product">
                   <option value="" disabled>Select an app…</option>
                   @for (a of allApps; track a.slug) {
-                    <option [value]="a.name">{{ a.name }}</option>
+                    <option [value]="a.slug">{{ a.name }}</option>
                   }
                 </select>
               }
@@ -85,11 +88,17 @@
               <label class="form-label" for="cf-message">Message</label>
               <textarea id="cf-message" class="form-control" formControlName="message"
                         placeholder="Describe your issue or question…" rows="5"></textarea>
+              @if (fieldError('message'); as e) { <span class="field-error">{{ e }}</span> }
+            </div>
+
+            <div class="hp-field" aria-hidden="true">
+              <label for="cf-website">Website</label>
+              <input id="cf-website" formControlName="website" tabindex="-1" autocomplete="off" />
             </div>
 
             <div class="form-actions">
-              <button class="btn-submit" type="submit" [disabled]="contactForm.invalid || isSubmitting">
-                @if (isSubmitting) {
+              <button class="btn-submit" type="submit" [disabled]="contactForm.invalid || submission.state() === 'submitting'">
+                @if (submission.state() === 'submitting') {
                   <span class="material-symbols-outlined">hourglass_empty</span>
                   Sending…
                 } @else {
@@ -99,18 +108,18 @@
               </button>
             </div>
 
-            @if (submitSuccess) {
-              <div class="form-success">
+            @if (submission.state() === 'success') {
+              <div class="form-success" role="status">
                 <span class="material-symbols-outlined">check_circle</span>
-                <p>Message sent! We'll get back to you within 48 hours.</p>
+                <p>Message sent. We've emailed you a copy and will reply within 48 hours.</p>
               </div>
             }
-            @if (submitError) {
-              <div class="form-error">
-                <span class="material-symbols-outlined">error</span>
-                <p>Something went wrong. Please email <strong>{{ contactEmail }}</strong> directly.</p>
-              </div>
-            }
+            <app-form-error
+              [state]="submission.state()"
+              [otherErrors]="submission.otherErrors()"
+              [subject]="app.name + ' support request'"
+              (retry)="onSubmitContact()"
+            />
           </form>
         </div>
 

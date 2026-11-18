@@ -1,0 +1,118 @@
+<div class="account-page">
+  <app-site-header pageName="Account" />
+
+  <main class="account-main">
+    <div class="account-inner">
+      @if (auth.user(); as user) {
+        <section class="profile card">
+          <div class="profile-avatar" aria-hidden="true">
+            @if (user.picture) {
+              <img [src]="user.picture" alt="" />
+            } @else {
+              {{ initials() }}
+            }
+          </div>
+          <div class="profile-text">
+            <h1 class="profile-name">{{ user.name || 'Your account' }}</h1>
+            <p class="profile-email">
+              {{ user.email }}
+              @if (user.emailVerified) {
+                <span class="verified">
+                  <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+                  Verified
+                </span>
+              }
+            </p>
+          </div>
+          <button type="button" class="btn-outline" (click)="signOut()">
+            <span class="material-symbols-outlined" aria-hidden="true">logout</span> Sign out
+          </button>
+        </section>
+      }
+
+      <section class="card" aria-labelledby="owned-h">
+        <h2 class="card-title" id="owned-h">Your purchases and perks</h2>
+        @switch (owned().state) {
+          @case ('loading') {
+            <div class="sk-rows" aria-busy="true">
+              <div class="sk"></div>
+              <div class="sk"></div>
+            </div>
+          }
+          @case ('error') {
+            <div class="inline-error" role="alert">
+              We couldn't load your purchases.
+              <button type="button" class="link-btn" (click)="loadEntitlements()">Try again</button>
+            </div>
+          }
+          @default {
+            @let rows = ownedRows();
+            @if (rows.length === 0) {
+              <p class="empty">
+                Nothing here yet. Founder pricing hasn't been announced, so there is nothing to buy.
+                <a routerLink="/ideas">Reserve a founder spot</a> to hear first.
+              </p>
+            } @else {
+              <ul class="rows">
+                @for (row of rows; track row.product.id) {
+                  <li class="row">
+                    <span class="row-main">{{ row.product.name }}</span>
+                    <span class="row-tags">
+                      @for (e of row.entitlements; track e.key) {
+                        <span class="tag">{{ e.key }}</span>
+                      }
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
+      </section>
+
+      <section class="card" aria-labelledby="subs-h">
+        <h2 class="card-title" id="subs-h">My reservations and messages</h2>
+        @switch (submissions().state) {
+          @case ('loading') {
+            <div class="sk-rows" aria-busy="true">
+              <div class="sk"></div>
+              <div class="sk"></div>
+              <div class="sk"></div>
+            </div>
+          }
+          @case ('error') {
+            <div class="inline-error" role="alert">
+              We couldn't load your messages.
+              <button type="button" class="link-btn" (click)="loadSubmissions()">Try again</button>
+            </div>
+          }
+          @default {
+            @let subs = submissionRows();
+            @if (subs.length === 0) {
+              <p class="empty">
+                You haven't reserved a spot or sent us anything yet.
+                <a routerLink="/ideas">Browse ideas</a>.
+              </p>
+            } @else {
+              <ul class="rows">
+                @for (s of subs; track s.id) {
+                  <li class="row">
+                    <span class="row-main">
+                      {{ kindLabels[s.kind] || s.kind }}
+                      <span class="row-sub">{{ productName(s.product) }}</span>
+                    </span>
+                    <time class="row-date" [attr.datetime]="s.createdAt">
+                      {{ s.createdAt | date: 'd MMM y' }}
+                    </time>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
+      </section>
+    </div>
+  </main>
+
+  <app-footer />
+</div>

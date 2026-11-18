@@ -50,7 +50,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
     slug: 'privacy',
     title: 'Privacy Policy',
     eyebrow: 'Legal',
-    lastUpdated: 'November 9, 2026',
+    lastUpdated: 'November 10, 2026',
     intro: `This policy explains what data ${BUSINESS.legalName} collects, why, and how we protect it. It covers our website nextjedi.com and our internal social publishing tool at ${SOCIAL_TOOL_URL}.`,
     sections: [
       {
@@ -170,9 +170,10 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       {
         heading: '13. Our website',
         paragraphs: [
-          'nextjedi.com does not use cookies, analytics or advertising trackers. If we add analytics, we will update this policy first.',
-          'Some pages have forms: an app waitlist, a beta tester sign-up, an idea box and a support form. If you fill one in, we collect what you type: usually your name, your email address, the app and platform you chose, and your message.',
-          'Form entries are stored in a Google Sheet that only our team can open, and Google processes them for us. We use them only to reply to you, add you to the waitlist or tester list you asked for, and improve our apps. We delete them on request, as described in section 12.',
+          'nextjedi.com does not set cookies itself and does not use analytics or advertising trackers. If we add analytics, we will update this policy first.',
+          'Some pages have forms: an app waitlist, a beta tester sign-up, an early-adopter (founder spot) reservation, an idea box and a support form. If you fill one in, we collect what you type: usually your name, your email address, the app and platform you chose, and your message. The idea box does not ask for your name or email.',
+          'Form entries are stored by Next Jedi in its own database, which only our team can access. We send you a confirmation email through our email provider, Resend, which processes your email address only to deliver it. We use form entries only to reply to you, add you to the waitlist, tester list or founder list you asked for, and improve our apps. We do not sell them or share them with advertisers. We delete them on request, as described in section 12.',
+          'You can sign in to nextjedi.com with an email code or with Google. Signing in creates an account with NextJedi Identity, our own sign-in service, which stores your name, email address and, if you use Google, the basic profile Google shares (name, email and picture). Your account lets you see your reservations and messages, and links new form entries to it. While you are signed in, your browser keeps the sign-in tokens in session storage for that tab; signing out removes them. The NextJedi Identity sign-in page sets its own cookie to keep you signed in there. You can ask us to delete your account at any time, as described in section 12.',
           'Our hosting provider, Vercel, may keep standard server logs, such as IP addresses, for security and reliability.',
           'The social publishing tool sets a login cookie only in the browsers of our own team members.',
         ],

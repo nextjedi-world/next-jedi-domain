@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { UserMenuComponent } from '../shared/user-menu/user-menu';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../seo.service';
 import { FooterComponent } from '../shared/footer/footer';
 
 @Component({
   selector: 'app-team',
-  imports: [RouterLink, FooterComponent],
+  imports: [RouterLink, FooterComponent, UserMenuComponent],
   templateUrl: './team.html',
   styles: [
     `

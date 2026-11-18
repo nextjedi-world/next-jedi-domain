@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { UserMenuComponent } from '../user-menu/user-menu';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { LEGAL_DOCS, LegalDoc } from '../content/legal.content';
 import { FooterComponent } from '../footer/footer';
@@ -6,7 +7,7 @@ import { SeoService } from '../../seo.service';
 
 @Component({
   selector: 'app-shared-legal',
-  imports: [RouterLink, FooterComponent],
+  imports: [RouterLink, FooterComponent, UserMenuComponent],
   templateUrl: './legal.html',
   styles: [`
     .sub-page { min-height: 100vh; display: flex; flex-direction: column;
